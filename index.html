@@ -11,6 +11,8 @@
     <main id="main-container">
         <!-- Autenticacao -->
         <section id="auth-view">
+
+            <!-- FORMULARIO DE LOGIN -->
             <form id="form-login">
 
                 <h2>Fazer Login</h2>
@@ -28,7 +30,34 @@
                 <button type="submit" class="btn-primary">Entrar</button>
                 <button type="button" class="btn-show-register">Não tem uma conta? Cadastre-se</button>
             </form>
+
+
+            <!-- FORMULARIO DE CADASTRO -->
+             <form id="form-register" style="display: none;">
+
+                <h2>Cadastre-se</h2>
+
+                <div class="input-group">
+                    <label for="register-user">Novo Usuário</label>
+                    <input id="register-user" type="text" placeholder="Crie seu nome de usuário" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="register-pass">Nova Senha</label>
+                    <input id="register-pass" type="password" placeholder="Crie sua senha" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm-register-pass">Confirmar senha</label>
+                    <input id="confirm-register-pass" type="password" placeholder="Confirme sua senha" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Criar Conta</button>
+                <button type="button" class="btn-cancel-register">Voltar</button>
+             </form>
         </section>
+
+
 
         <!-- APP LOGADO-->
         <section id="app-view" style="display: none;">
@@ -47,11 +76,11 @@
             <nav class="bottom-nav">
                 <ul>
                     <li><button id="nav-faltas" class="nav-btn active">Faltas</button></li>
-                    <li></li><button id="nav-notas" class="nav-btn">Notas</button></li>
-                    <li></li><button id="nav-perfil" class="nav-btn">Perfil</button></li>
+                    <li><button id="nav-notas" class="nav-btn">Notas</button></li>
+                    <li><button id="nav-perfil" class="nav-btn">Perfil</button></li>
                 </ul>
             </nav>
-            
+
         </section>
 
     </main>
