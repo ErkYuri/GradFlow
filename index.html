@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>GradFlow</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+    <main id="main-container">
+        <!-- Autenticacao -->
+        <section id="auth-view">
+            <form id="form-login">
+
+                <h2>Fazer Login</h2>
+
+                <div class="input-group">
+                    <label for="login-user">Usuário</label>
+                    <input id="login-user" type="text" placeholder="Informe seu usuário" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="login-pass">Senha</label>
+                    <input id="login-pass" type="password" placeholder="Informe a senha" required>
+                </div>
+
+                <button type="submit" class="btn-primary">Entrar</button>
+                <button type="button" class="btn-show-register">Não tem uma conta? Cadastre-se</button>
+            </form>
+        </section>
+
+        <!-- APP LOGADO-->
+        <section id="app-view" style="display: none;">
+
+        <!-- Header fixo do app -->
+            <header>
+            <h1 id="page-title">Faltas</h1>
+            </header>
+
+            <!-- Conteudo dinamico -->
+            <article id="content-area">
+
+            </article>
+
+            <!-- Barra de navegacao -->
+            <nav class="bottom-nav">
+                <ul>
+                    <li><button id="nav-faltas" class="nav-btn active">Faltas</button></li>
+                    <li></li><button id="nav-notas" class="nav-btn">Notas</button></li>
+                    <li></li><button id="nav-perfil" class="nav-btn">Perfil</button></li>
+                </ul>
+            </nav>
+            
+        </section>
+
+    </main>
+
+    <script src="./app.js"></script>
+</body>
+</html>
