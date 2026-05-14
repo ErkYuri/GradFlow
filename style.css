@@ -16,6 +16,65 @@ body {
     min-height: 100dvh;
 }
 
-main-container {
-    padding: 0;
+#main-container {
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100dvh;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 400px;
+    background-color: #EEEEEE;
+    padding: 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(132, 29, 51, 0.1);
+}
+
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    width: 100%;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px
+}
+
+.btn-primary {
+    font-size: 16px;
+    background-color: var(--brand-color);
+    color: #ffffff;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    padding: 10px;
+}
+
+.btn-show-register {
+    font-size: 16px;
+    background-color: transparent;
+    border: none;
+    color: var(--brand-color);
+    padding: 2px;
+}
+
+.btn-cancel-register {
+    font-size: 16px;
+    background-color: transparent;
+    border-radius: 8px;
+    border: 2px solid #841D33;
+    width: 100%;
+    padding: 8px;
 }
