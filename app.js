@@ -35,6 +35,10 @@ formLogin.addEventListener('submit', function(evento){
     appView.style.display = 'block';
 })
 
+
+
+// --------------------------------------- CADASTRO DE NOVO USUARIO ---------------------------------------------------------------------------
+
 // registrar cadastro
 formRegister.addEventListener('submit', function(evento) {
 
@@ -76,10 +80,14 @@ formRegister.addEventListener('submit', function(evento) {
     formLogin.style.display = 'flex';
 });
 
+
+
+// --------------------------------------- LOGIN DE USUARIO -----------------------------------------------------------------
+
 // realizar login
 formLogin.addEventListener('submit', function(){
 
-    
-})
+
+});
 
 
