@@ -15,6 +15,14 @@ const btnSettings = document.getElementById('btn-settings');
 const modalSettings = document.getElementById('settings-modal');
 const btnCloseSettings = document.getElementById('btn-close-settings');
 
+// variavel para logout
+const btnLogout = document.getElementById('btn-logout');
+
+// variavel para exportar dados
+const btnExportar = document.getElementById('btn-exportar');
+
+
+// ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
 
 // logica para exibir formlario cadastro ao clicar no botao
 btnShowRegister.addEventListener('click', function(){
@@ -295,10 +303,45 @@ function excluirDisciplina(indexMateria){
 btnSettings.addEventListener('click', function(){
 
     modalSettings.style.display = 'flex';
+
+    const user = localStorage.getItem('loggedUser');
+
+    document.getElementById('modal-username').innerText = user;
    
 });
 
 btnCloseSettings.addEventListener('click', function(){
 
     modalSettings.style.display = 'none';
+});
+
+// LOGOUT
+btnLogout.addEventListener('click', function(){
+
+    localStorage.removeItem('loggedUser');
+
+    appView.style.display = 'none';
+    authView.style.display = 'flex';
+    modalSettings.style.display = 'none';
+});
+
+// EXPORTAR DADOS (Backup)
+btnExportar.addEventListener('click', function() {
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = localStorage.getItem(usuarioLogado); // Pega o JSON cru (texto)
+
+    // 1. Cria um "arquivo virtual" (.json) na memória do navegador
+    const blob = new Blob([dadosSalvos], { type: 'application/json' });
+    
+    // 2. Cria um link <a> invisível
+    const linkInvisivel = document.createElement('a');
+    
+    // 3. Aponta o link para o nosso arquivo virtual
+    linkInvisivel.href = URL.createObjectURL(blob);
+    
+    // 4. Define o nome do arquivo que será baixado
+    linkInvisivel.download = `gradflow_backup_${usuarioLogado}.json`;
+    
+    // 5. O JS clica no link!
+    linkInvisivel.click();
 });
