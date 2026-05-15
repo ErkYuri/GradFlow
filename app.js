@@ -10,6 +10,12 @@ const formRegister = document.getElementById('form-register'); // variavel para 
 const btnShowRegister = document.querySelector('.btn-show-register');
 const btnCancelRegister = document.querySelector('.btn-cancel-register');
 
+// variavel para modal de configuracoes
+const btnSettings = document.getElementById('btn-settings');
+const modalSettings = document.getElementById('settings-modal');
+const btnCloseSettings = document.getElementById('btn-close-settings');
+
+
 // logica para exibir formlario cadastro ao clicar no botao
 btnShowRegister.addEventListener('click', function(){
 
@@ -25,15 +31,6 @@ btnCancelRegister.addEventListener('click', function(){
     formLogin.style.display = 'flex'; // exibe form login
 });
 
-
-// logica para autenticacao do usuario
-formLogin.addEventListener('submit', function(evento){
-
-    evento.preventDefault(); // impede que a pagina recarrega
-
-    authView.style.display = 'none';
-    appView.style.display = 'block';
-})
 
 
 
@@ -85,9 +82,223 @@ formRegister.addEventListener('submit', function(evento) {
 // --------------------------------------- LOGIN DE USUARIO -----------------------------------------------------------------
 
 // realizar login
-formLogin.addEventListener('submit', function(){
+formLogin.addEventListener('submit', function(evento){
 
+    evento.preventDefault(); // impede a pagina de recarregar ao dar submit
+
+    const user = document.getElementById('login-user').value.trim();
+    const pass = document.getElementById('login-pass').value;
+
+    // valida usuario
+    if(localStorage.getItem(user) == null){
+        alert('Usuario não encontrado!');
+        return;
+    }
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(user));
+
+    if(pass !== dadosSalvos.password){
+        alert('Senha incorreta.');
+        return;
+    }
+
+    localStorage.setItem('loggedUser', user);
+
+    authView.style.display='none';
+    appView.style.display='block';
+
+    atualizarDisciplinas();
 
 });
 
 
+
+// --------------------------------------- AREA DO APP -----------------------------------------------------------------
+
+// selecionando inputs de adicionar disciplina
+
+const inputDisciplina = document.getElementById('input-disciplina');
+const inputLimite = document.getElementById('input-limite');
+const btnAddDisciplina = document.getElementById('btn-add-disciplina');
+
+btnAddDisciplina.addEventListener('click', function(){
+
+    // capturando os valores
+    const nomeDisciplina = inputDisciplina.value.trim();
+    const limiteFaltas = inputLimite.value;
+
+    if(nomeDisciplina == '' || limiteFaltas == ''){
+        alert('Verifique se todos campos foram preenchidos');
+        return;
+    }
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+
+    const novaDisciplina = {
+        nome: nomeDisciplina,
+        limite: parseInt(limiteFaltas),
+        faltas: 0
+    };
+
+    // salva na variavel de nova disciplina
+    dadosSalvos.disciplinas.push(novaDisciplina);
+
+    // converte em texto no bd json
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    // limpa os campos
+    inputDisciplina.value = '';
+    inputLimite.value = '';
+
+    alert('Disciplina adicionada');
+
+    atualizarDisciplinas(); //renderiza as disciplinas cadastradas
+})
+
+const ListaDisciplinas = document.getElementById('lista-disciplinas');
+
+function atualizarDisciplinas(){
+
+    // verificar user logado
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    if(!usuarioLogado) return;
+
+    // pega os dados dele no banco
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    // limpa tela antes de renderizar
+    ListaDisciplinas.innerHTML = '';
+
+    dadosSalvos.disciplinas.forEach(function(disciplina, index) {
+        // 1. Regra de 3 e Cor
+        const porcentagemFaltas = (disciplina.faltas / disciplina.limite) * 100;
+        const corBarra = calcularGradiente(porcentagemFaltas);
+
+        // 2. Lógica do Aviso
+        let avisoHTML = '';
+        if (porcentagemFaltas >= 100) {
+            avisoHTML = `<p style="color: #cc0000; font-weight: bold; font-size: 13px; margin-top: 8px;">⛔ Limite de faltas atingido!</p>`;
+        } else if (porcentagemFaltas >= 80) {
+            avisoHTML = `<p style="color: #e6a700; font-weight: bold; font-size: 13px; margin-top: 8px;">⚠️ Atenção: 80% do limite atingido.</p>`;
+        }
+
+        // 3. Atualizando o HTML do Card
+        const cardHTML = `
+            <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <h3 style="margin-top: 0; color: var(--brand-color);">${disciplina.nome}</h3>
+                <p style="margin: 8px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
+                
+                <div style="width: 100%; background: #eee; border-radius: 10px; height: 10px; margin-bottom: 8px; overflow: hidden;">
+                    <div style="height: 100%; background: ${corBarra}; width: ${porcentagemFaltas}%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                </div>
+
+                ${avisoHTML}
+
+                <div style="display: flex; gap: 8px; margin-top: 12px;">
+                    <button onclick="adicionarFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Falta</button>
+                    <button onclick="removerFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">- Falta</button>
+                    <button onclick="excluirDisciplina(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #480000; color: #fff; font-weight: bold; cursor: pointer;">Excluir</button>
+                </div>
+            </div>
+        `;
+
+        ListaDisciplinas.innerHTML += cardHTML;
+    });
+}
+
+
+
+// adicionar falta
+function adicionarFalta(indexMateria){
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    const materia = dadosSalvos.disciplinas[indexMateria];
+
+    if(materia.faltas < materia.limite){
+        materia.faltas += 1
+
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+        atualizarDisciplinas();
+    } else {
+        alert('Limite de faltas atingido!')
+    }
+}
+
+
+// remover falta
+function removerFalta(indexMateria){
+    const usuarioLogado = localStorage.getItem('loggedUser');
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    const materia = dadosSalvos.disciplinas[indexMateria];
+
+    if(materia.faltas > 0){
+        materia.faltas -= 1;
+
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+        atualizarDisciplinas();
+
+    } // nao precisa de else pois usuario vai entender que faltas já é zero e n dá pra subtrair
+}
+
+
+
+// calcular porcentagem para barra de progresso de faltas
+function calcularGradiente(perc) {
+    let r, g, b;
+
+    if(perc <= 50) {
+        const ratio = perc / 50;
+        r = Math.round(0 + (255 - 0) * ratio);
+        g = 200;
+        b = 0;
+    } else {
+        const ratio = (perc - 50) / 50;
+        r = 255 - Math.round((255 - 200) * ratio);
+        g = 200 - Math.round(200 * ratio);
+        b = 0;
+    }
+    return `rgb(${r},${g},${b})`;
+}
+
+
+// Excluir materia
+function excluirDisciplina(indexMateria){
+    const confirmacao = confirm('Excluir disciplina?');
+
+    if(!confirmacao) {
+        return;
+    }
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    dadosSalvos.disciplinas.splice(indexMateria, 1);
+
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    atualizarDisciplinas();
+}
+
+
+
+// abrir modal de configuracoes
+btnSettings.addEventListener('click', function(){
+
+    modalSettings.style.display = 'flex';
+   
+});
+
+btnCloseSettings.addEventListener('click', function(){
+
+    modalSettings.style.display = 'none';
+});

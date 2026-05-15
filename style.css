@@ -25,6 +25,15 @@ body {
     min-height: 100dvh;
 }
 
+#app-view {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    min-width: 10dvh;
+    background-color: var(--bg-color);
+}
+
 form {
     display: flex;
     flex-direction: column;
@@ -36,7 +45,6 @@ form {
     border-radius: 16px;
     box-shadow: 0 8px 24px rgba(132, 29, 51, 0.1);
 }
-
 
 input {
     padding: 10px;
@@ -78,3 +86,85 @@ input {
     width: 100%;
     padding: 8px;
 }
+
+
+/*-------------------------------------------- TELA INICIAL --------------------------------------------------*/
+
+header {
+    background-color: var(--brand-color);
+    color: #ffffff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 22px;
+}
+
+/* fixando navbar */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #FFFFFF;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+}
+
+.bottom-nav ul {
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+    display: flex;
+    justify-content: space-around;
+}
+
+.nav-btn {
+    background: transparent;
+    border-style: none;
+    padding: 12px;
+    color: gray;
+    width: 100%;
+}
+
+.nav-btn-active {
+    background: var(--brand-color);
+    border-style: none;
+    padding: 12px;
+    font-weight: bold;
+    background: transparent;
+}
+
+
+/* Barra de adicionar disciplina */
+
+#content-area {
+    padding: 20px;
+    padding-bottom: 80px;
+}
+.add-subject {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+}
+
+.add-subject input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+#btn-add-disciplina {
+    background: var(--brand-color);
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    color: #fff;
+    font-weight: bold;
+}
+

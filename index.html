@@ -62,24 +62,45 @@
         <!-- APP LOGADO-->
         <section id="app-view" style="display: none;">
 
-        <!-- Header fixo do app -->
+            <!-- Header fixo do app -->
             <header>
-            <h1 id="page-title">Faltas</h1>
+            <h1 id="page-title">GradFlow</h1>
+            <button id="btn-settings" style="background: transparent; border: none; font-size: 24px; cursor: pointer;">⚙️</button>
             </header>
 
             <!-- Conteudo dinamico -->
             <article id="content-area">
+                <div class="add-subject">
+                    <input id="input-disciplina" type="text" placeholder="Nome da disciplina">
+                    <input id="input-limite" type="number" placeholder="Limite de faltas">
+                    <button id="btn-add-disciplina">Adicionar</button>
+                </div>
+
+                <div id="lista-disciplinas" class="disciplinas">
+                
+                </div>
 
             </article>
 
             <!-- Barra de navegacao -->
             <nav class="bottom-nav">
                 <ul>
-                    <li><button id="nav-faltas" class="nav-btn active">Faltas</button></li>
+                    <li><button id="nav-faltas" class="nav-btn-active">Faltas</button></li>
                     <li><button id="nav-notas" class="nav-btn">Notas</button></li>
-                    <li><button id="nav-perfil" class="nav-btn">Perfil</button></li>
                 </ul>
             </nav>
+
+            <div id="settings-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    
+                <div style="background: #fff; padding: 24px; border-radius: 16px; width: 90%; max-width: 400px;">
+                    <h2 style="margin-top: 0; color: var(--brand-color);">Configurações</h2>
+                    
+                    <p><strong>Usuário:</strong> <span id="modal-username">---</span></p>
+                    
+                    <button id="btn-close-settings" style="width: 100%; padding: 12px; margin-top: 16px; background: #ccc; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Fechar</button>
+                </div>
+
+            </div>
 
         </section>
 
