@@ -25,6 +25,14 @@ const btnExportar = document.getElementById('btn-exportar');
 const btnImportar = document.getElementById('btn-importar');
 const inputImportar = document.getElementById('input-importar');
 
+// variaveis para alterar senha
+const inputNewPass = document.getElementById('input-new-pass');
+const btnChangePass = document.getElementById('btn-change-pass');
+
+// variaveis para alterar usuario
+const inputNewUser = document.getElementById('input-new-user');
+const btnChangeUser = document.getElementById('btn-change-user');
+
 
 // ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
 
@@ -309,8 +317,6 @@ btnSettings.addEventListener('click', function(){
     modalSettings.style.display = 'flex';
 
     const user = localStorage.getItem('loggedUser');
-
-    document.getElementById('modal-username').innerText = user;
    
 });
 
@@ -399,4 +405,57 @@ inputImportar.addEventListener('change', function(evento) {
 
     
     leitor.readAsText(arquivo);
+});
+
+
+// alterar senha
+btnChangePass.addEventListener('click', function(){
+    const newPass = inputNewPass.value.trim();
+
+    if(newPass === ''){
+        alert('Informe a nova senha');
+        return;
+    } 
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    
+    dadosSalvos.password = newPass;
+
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    inputNewPass.value= '';
+
+    alert('Senha alterada');
+});
+
+
+// alterar nome de usuário
+btnChangeUser.addEventListener('click', function(){
+    const newUser = inputNewUser.value.trim();
+    const currentUser = localStorage.getItem('loggedUser');
+
+    // validações de segurança
+    if(newUser === ''){
+        alert('Informe o novo nome de usuário');
+        return;
+    }
+    if(newUser === currentUser){
+        alert('Este já é o seu usuário atual!');
+        return;
+    }
+    if(localStorage.getItem(newUser) !== null){
+        alert('Este usuário já existe. Escolha outro nome!');
+        return;
+    }
+
+    const dadosSalvos = localStorage.getItem(currentUser); 
+    
+    localStorage.setItem(newUser, dadosSalvos);
+    localStorage.removeItem(currentUser);
+    
+    localStorage.setItem('loggedUser', newUser); 
+
+    inputNewUser.value = '';
+    alert('Usuário alterado com sucesso!');
 });
