@@ -21,6 +21,10 @@ const btnLogout = document.getElementById('btn-logout');
 // variavel para exportar dados
 const btnExportar = document.getElementById('btn-exportar');
 
+// variaveis para importar dados
+const btnImportar = document.getElementById('btn-importar');
+const inputImportar = document.getElementById('input-importar');
+
 
 // ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
 
@@ -344,4 +348,55 @@ btnExportar.addEventListener('click', function() {
     
     // 5. O JS clica no link!
     linkInvisivel.click();
+});
+
+
+// Restaurar Backup
+btnImportar.addEventListener('click', function() {
+    inputImportar.click(); 
+});
+
+// usuário escolhe um arquivo do computador
+inputImportar.addEventListener('change', function(evento) {
+    const arquivo = evento.target.files[0]; // Pega o primeiro arquivo que o usuário selecionou
+
+    if (!arquivo) {
+        return;
+    }
+
+    // leitor de arquivos do JS
+    const leitor = new FileReader();
+
+
+    leitor.onload = function(e) {
+        try {
+            const conteudoDeTexto = e.target.result; 
+            
+            // Tenta transformar o texto de volta em objeto JavaScript
+            const dadosImportados = JSON.parse(conteudoDeTexto);
+
+            // Validação de Segurança
+            if (dadosImportados.password === undefined || dadosImportados.disciplinas === undefined) {
+                alert('Arquivo de backup inválido ou corrompido.');
+                return;
+            }
+
+            // salva no banco de dados do usuário atual e atualiza a tela
+            const usuarioLogado = localStorage.getItem('loggedUser');
+            localStorage.setItem(usuarioLogado, JSON.stringify(dadosImportados));
+            
+            atualizarDisciplinas();
+            alert('Backup restaurado com sucesso!');
+            
+            // Limpa o input para caso o usuário queira importar de novo depois
+            inputImportar.value = ''; 
+            
+        } catch (erro) {
+            // Se o JSON.parse falhar
+            alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo .json válido.');
+        }
+    };
+
+    
+    leitor.readAsText(arquivo);
 });
