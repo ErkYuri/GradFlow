@@ -1,152 +1,142 @@
 // ---------------------------------------------------------
-// VARIAVEIS
+// VARIÁVEIS GERAIS
 // ---------------------------------------------------------
 
-// variaveis para troca de telas
-const viewFaltas = document.getElementById('view-faltas');
-const viewNotas = document.getElementById('view-notas');
-
-const navFaltas = document.getElementById('nav-faltas');
-const navNotas = document.getElementById('nav-notas');
-
-// variaveis para autenticacao do usuario
+// Telas principais
 const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
+const viewFaltas = document.getElementById('view-faltas');
+const viewNotas = document.getElementById('view-notas');
+const viewEventos = document.getElementById('view-eventos'); // NOVA TELA
 
-// define variaveis para os formularios de cadastro e login
-const formLogin = document.getElementById('form-login'); // variavel pra form login
-const formRegister = document.getElementById('form-register'); // variavel para form cadastro
+// Navegação Inferior
+const navFaltas = document.getElementById('nav-faltas');
+const navNotas = document.getElementById('nav-notas');
+const navEventos = document.getElementById('nav-eventos'); // NOVO BOTÃO
 
-// variaveis para botoes de cadastrar e cancelar cadastro
+// Autenticação
+const formLogin = document.getElementById('form-login');
+const formRegister = document.getElementById('form-register');
 const btnShowRegister = document.querySelector('.btn-show-register');
 const btnCancelRegister = document.querySelector('.btn-cancel-register');
 
-// variavel para modal de configuracoes
+// Configurações e Backup
 const btnSettings = document.getElementById('btn-settings');
 const modalSettings = document.getElementById('settings-modal');
 const btnCloseSettings = document.getElementById('btn-close-settings');
-
-// variavel para logout
 const btnLogout = document.getElementById('btn-logout');
-
-// variavel para exportar dados
 const btnExportar = document.getElementById('btn-exportar');
-
-// variaveis para importar dados
 const btnImportar = document.getElementById('btn-importar');
 const inputImportar = document.getElementById('input-importar');
-
-// variaveis para alterar senha
 const inputNewPass = document.getElementById('input-new-pass');
-
-// variaveis para alterar usuario
 const inputNewUser = document.getElementById('input-new-user');
 const btnSaveChanges = document.getElementById('btn-save-changes');
 
-
-// variavel para barra de pesquisa
+// Pesquisa e Listagem
 const inputPesquisa = document.getElementById('input-pesquisa');
+const ListaDisciplinas = document.getElementById('lista-disciplinas');
+
+// Botão Flutuante e Modal de Criação
+const fabMain = document.getElementById('fab-main');
+const fabMenu = document.getElementById('fab-menu');
+const btnFabDisciplina = document.getElementById('btn-fab-disciplina');
+const btnFabEvento = document.getElementById('btn-fab-evento');
+
+const createDisciplinaModal = document.getElementById('create-disciplina-modal');
+const inputCreateNome = document.getElementById('input-create-nome');
+const inputCreateLimite = document.getElementById('input-create-limite');
+const btnSaveNewDisciplina = document.getElementById('btn-save-new-disciplina');
+const btnCancelNewDisciplina = document.getElementById('btn-cancel-new-disciplina');
+
+// Modal de Edição
+let indiceEdicao = null;
+const editModal = document.getElementById('edit-modal');
+const inputEditName = document.getElementById('input-edit-nome');
+const inputEditLimite = document.getElementById('input-edit-limite');
+const btnSaveEdit = document.getElementById('btn-save-edit');
+const btnCancelEdit = document.getElementById('btn-cancel-edit');
 
 
 // ---------------------------------------------------------
-// NAVEGACAO DE TELAS
+// NAVEGAÇÃO DE TELAS
 // ---------------------------------------------------------
 
-// tela de notas
-navNotas.addEventListener('click', function(){
-
-    viewFaltas.style.display='none';
-    viewNotas.style.display='block';
-
-    navNotas.className='nav-btn-active';
-    navFaltas.className='nav-btn';
-});
+function esconderTodasAsTelas() {
+    viewFaltas.style.display = 'none';
+    viewNotas.style.display = 'none';
+    viewEventos.style.display = 'none';
+    navFaltas.className = 'nav-btn';
+    navNotas.className = 'nav-btn';
+    navEventos.className = 'nav-btn';
+}
 
 navFaltas.addEventListener('click', function(){
-
-    viewNotas.style.display='none';
-    viewFaltas.style.display='block';
-
-    navFaltas.className='nav-btn-active';
-    navNotas.className='nav-btn';
+    esconderTodasAsTelas();
+    viewFaltas.style.display = 'block';
+    navFaltas.className = 'nav-btn-active';
 });
 
-// ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
+navNotas.addEventListener('click', function(){
+    esconderTodasAsTelas();
+    viewNotas.style.display = 'block';
+    navNotas.className = 'nav-btn-active';
+});
 
-// logica para exibir formlario cadastro ao clicar no botao
+navEventos.addEventListener('click', function(){
+    esconderTodasAsTelas();
+    viewEventos.style.display = 'block';
+    navEventos.className = 'nav-btn-active';
+});
+
+
+// ---------------------------------------------------------
+// AUTENTICAÇÃO 
+// ---------------------------------------------------------
+
 btnShowRegister.addEventListener('click', function(){
-
-    formLogin.style.display = 'none'; // esconde formulario de login
-    formRegister.style.display = 'flex'; // exibe formulario de cadastro
+    formLogin.style.display = 'none';
+    formRegister.style.display = 'flex';
 });
 
-
-// logica para cancelar formulario cadastro e voltar pro login
 btnCancelRegister.addEventListener('click', function(){
-
-    formRegister.style.display = 'none'; // oculta formulario cadastro
-    formLogin.style.display = 'flex'; // exibe form login
+    formRegister.style.display = 'none';
+    formLogin.style.display = 'flex';
 });
 
-
-
-
-// --------------------------------------- CADASTRO DE NOVO USUARIO ---------------------------------------------------------------------------
-
-// registrar cadastro
 formRegister.addEventListener('submit', function(evento) {
-
     evento.preventDefault();
 
-    // capturando os inputs do formulario
-    const newUser = document.getElementById('register-user').value.trim(); // .trim() remove espacos vazios acidentais
+    const newUser = document.getElementById('register-user').value.trim();
     const newPass = document.getElementById('register-pass').value;
     const ConfirmPass = document.getElementById('confirm-register-pass').value;
 
-
-    // validando senha
     if(newPass !== ConfirmPass){
-        alert('As senhas não conferem. Favor verificar')
+        alert('As senhas não conferem. Favor verificar');
         return;
     }
-
-    // validando usuario disponivel
     if(localStorage.getItem(newUser) !== null){
-        alert('Usuário já existente. Tente outro.')
+        alert('Usuário já existente. Tente outro.');
         return;
     }
 
-    // salvando dados do usuario no localstorage
     const dadosUsuario = {
         password: newPass,
         disciplinas: []
     };
 
-    // transforma dados do usuario em string para salvar no localstorage
     localStorage.setItem(newUser, JSON.stringify(dadosUsuario));
-
-    // confirma criacao do usuario e volta pra tela de login
     alert('Usuário cadastrado!');
-
     formRegister.reset();
-
     formRegister.style.display = 'none';
     formLogin.style.display = 'flex';
 });
 
-
-
-// --------------------------------------- LOGIN DE USUARIO -----------------------------------------------------------------
-
-// realizar login
 formLogin.addEventListener('submit', function(evento){
-
-    evento.preventDefault(); // impede a pagina de recarregar ao dar submit
+    evento.preventDefault(); 
 
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value;
 
-    // valida usuario
     if(localStorage.getItem(user) == null){
         alert('Usuario não encontrado!');
         return;
@@ -160,97 +150,118 @@ formLogin.addEventListener('submit', function(evento){
     }
 
     localStorage.setItem('loggedUser', user);
-
-    authView.style.display='none';
-    appView.style.display='block';
-
+    authView.style.display = 'none';
+    appView.style.display = 'block';
     atualizarDisciplinas();
-
 });
 
 
+// ---------------------------------------------------------
+// BOTÃO FAB E CRIAÇÃO DE DISCIPLINA
+// ---------------------------------------------------------
 
-// --------------------------------------- AREA DO APP -----------------------------------------------------------------
+const fabOverlay = document.getElementById('fab-overlay'); // Seleciona o fundo escuro
 
-// selecionando inputs de adicionar disciplina
+// Função auxiliar para fechar tudo do FAB de uma vez
+function fecharFabMenu() {
+    fabMenu.style.display = 'none';
+    fabMain.classList.remove('active');
+    fabOverlay.style.display = 'none'; // Esconde o fundo escuro
+}
 
-const inputDisciplina = document.getElementById('input-disciplina');
-const inputLimite = document.getElementById('input-limite');
-const btnAddDisciplina = document.getElementById('btn-add-disciplina');
+// Abre/Fecha o Menu do botão +
+fabMain.addEventListener('click', function() {
+    if (fabMenu.style.display === 'none' || fabMenu.style.display === '') {
+        // Abre o menu
+        fabMenu.style.display = 'flex';
+        fabMain.classList.add('active'); 
+        fabOverlay.style.display = 'block'; // Mostra o fundo escuro
+    } else {
+        // Fecha o menu
+        fecharFabMenu();
+    }
+});
 
-btnAddDisciplina.addEventListener('click', function(){
+// Clica no fundo escuro fora do botão também fecha o menu
+fabOverlay.addEventListener('click', fecharFabMenu);
 
-    // capturando os valores
-    const nomeDisciplina = inputDisciplina.value.trim();
-    const limiteFaltas = inputLimite.value;
+// Clica em "Nova Disciplina"
+btnFabDisciplina.addEventListener('click', function() {
+    fecharFabMenu(); // Usa a função auxiliar para recolher o botão e o fundo
+    createDisciplinaModal.style.display = 'flex';
+});
 
-    if(nomeDisciplina == '' || limiteFaltas == ''){
+// Clica em "Novo Evento"
+btnFabEvento.addEventListener('click', function() {
+    fecharFabMenu();
+    alert('A criação de eventos será implementada em breve! 🚧');
+});
+
+// Cancela a criação da disciplina
+btnCancelNewDisciplina.addEventListener('click', function() {
+    createDisciplinaModal.style.display = 'none';
+});
+
+// Salva a nova disciplina
+btnSaveNewDisciplina.addEventListener('click', function(){
+    const nomeDisciplina = inputCreateNome.value.trim();
+    const limiteFaltas = inputCreateLimite.value;
+
+    if(nomeDisciplina === '' || limiteFaltas === ''){
         alert('Verifique se todos campos foram preenchidos');
         return;
     }
 
     const usuarioLogado = localStorage.getItem('loggedUser');
-
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
 
     const novaDisciplina = {
         nome: nomeDisciplina,
         limite: parseInt(limiteFaltas),
-        faltas: 0
+        faltas: 0,
+        atividades: [] 
     };
 
-    // salva na variavel de nova disciplina
     dadosSalvos.disciplinas.push(novaDisciplina);
-
-    // converte em texto no bd json
     localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
 
-    // limpa os campos
-    inputDisciplina.value = '';
-    inputLimite.value = '';
+    inputCreateNome.value = '';
+    inputCreateLimite.value = '';
 
-    alert('Disciplina adicionada');
+    createDisciplinaModal.style.display = 'none';
+    atualizarDisciplinas(); 
+});
 
-    atualizarDisciplinas(); //renderiza as disciplinas cadastradas
-})
 
-const ListaDisciplinas = document.getElementById('lista-disciplinas');
+// ---------------------------------------------------------
+// RENDERIZAÇÃO E FILTRO (TELA DE FALTAS)
+// ---------------------------------------------------------
 
 function atualizarDisciplinas(termoPesquisa = ''){
-
-    // verificar user logado
     const usuarioLogado = localStorage.getItem('loggedUser');
     if(!usuarioLogado) return;
 
-    // pega os dados dele no banco
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
-    // limpa tela antes de renderizar
     ListaDisciplinas.innerHTML = '';
 
     const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
         const nomeMateria = disciplina.nome.toLowerCase();
         const textoPesquisado = termoPesquisa.toLowerCase();
         return nomeMateria.includes(textoPesquisado);
-    })
+    });
 
     if(disciplinasFiltradas.length === 0){
-        // Se estiver vazia, INJETA o HTML da mensagem
         ListaDisciplinas.innerHTML = `
             <div style="text-align: center; margin-top: 40px; color: #777;">
                 <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
-                <p>Nenhuma disciplina cadastrada.<br>Adicione sua primeira matéria acima!</p>
+                <p>Nenhuma disciplina encontrada.<br>Adicione no botão + abaixo!</p>
             </div>
         `;
     } else {
-        
         disciplinasFiltradas.forEach(function(disciplina, index) {
-            // 1. Regra de 3 e Cor
             const porcentagemFaltas = (disciplina.faltas / disciplina.limite) * 100;
             const corBarra = calcularGradiente(porcentagemFaltas);
 
-            // 2. Lógica do Aviso
             let avisoHTML = '';
             if (porcentagemFaltas >= 100) {
                 avisoHTML = `<p style="color: #cc0000; font-weight: bold; font-size: 13px; margin-top: 8px;">⛔ Limite de faltas atingido!</p>`;
@@ -258,7 +269,6 @@ function atualizarDisciplinas(termoPesquisa = ''){
                 avisoHTML = `<p style="color: #e6a700; font-weight: bold; font-size: 13px; margin-top: 8px;">⚠️ Atenção: 80% do limite atingido.</p>`;
             }
 
-            // 3. Atualizando o HTML do Card
             const cardHTML = `
                 <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
                     <h3 style="margin-top: 0; color: var(--brand-color);">${disciplina.nome}</h3>
@@ -278,67 +288,56 @@ function atualizarDisciplinas(termoPesquisa = ''){
                     </div>
                 </div>
             `;
-
             ListaDisciplinas.innerHTML += cardHTML;
         });
     }
-
-    
 }
-
 
 inputPesquisa.addEventListener('input', function(evento){
     const textoDigitado = evento.target.value;
     atualizarDisciplinas(textoDigitado);
 });
 
-
-
-// adicionar falta
 function adicionarFalta(indexMateria){
-
     const usuarioLogado = localStorage.getItem('loggedUser');
-
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
     const materia = dadosSalvos.disciplinas[indexMateria];
 
     if(materia.faltas < materia.limite){
-        materia.faltas += 1
-
+        materia.faltas += 1;
         localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
         atualizarDisciplinas();
     } else {
-        alert('Limite de faltas atingido!')
+        alert('Limite de faltas atingido!');
     }
 }
 
-
-// remover falta
 function removerFalta(indexMateria){
     const usuarioLogado = localStorage.getItem('loggedUser');
-
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
     const materia = dadosSalvos.disciplinas[indexMateria];
 
     if(materia.faltas > 0){
         materia.faltas -= 1;
-
         localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
         atualizarDisciplinas();
-
-    } // nao precisa de else pois usuario vai entender que faltas já é zero e n dá pra subtrair
+    }
 }
 
+function excluirDisciplina(indexMateria){
+    const confirmacao = confirm('Excluir disciplina?');
+    if(!confirmacao) return;
 
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
 
-// calcular porcentagem para barra de progresso de faltas
+    dadosSalvos.disciplinas.splice(indexMateria, 1);
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+    atualizarDisciplinas();
+}
+
 function calcularGradiente(perc) {
     let r, g, b;
-
     if(perc <= 50) {
         const ratio = perc / 50;
         r = Math.round(0 + (255 - 0) * ratio);
@@ -354,206 +353,18 @@ function calcularGradiente(perc) {
 }
 
 
-// Excluir materia
-function excluirDisciplina(indexMateria){
-    const confirmacao = confirm('Excluir disciplina?');
-
-    if(!confirmacao) {
-        return;
-    }
-
-    const usuarioLogado = localStorage.getItem('loggedUser');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
-    dadosSalvos.disciplinas.splice(indexMateria, 1);
-
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
-    atualizarDisciplinas();
-}
-
-
-
-// abrir modal de configuracoes
-btnSettings.addEventListener('click', function(){
-
-    modalSettings.style.display = 'flex';
-
-    const user = localStorage.getItem('loggedUser');
-   
-});
-
-btnCloseSettings.addEventListener('click', function(){
-
-    modalSettings.style.display = 'none';
-});
-
-// LOGOUT
-btnLogout.addEventListener('click', function(){
-
-    localStorage.removeItem('loggedUser');
-
-    appView.style.display = 'none';
-    authView.style.display = 'flex';
-    modalSettings.style.display = 'none';
-});
-
-// EXPORTAR DADOS (Backup)
-btnExportar.addEventListener('click', function() {
-    const usuarioLogado = localStorage.getItem('loggedUser');
-    const dadosSalvos = localStorage.getItem(usuarioLogado); // Pega o JSON cru (texto)
-
-    // 1. Cria um "arquivo virtual" (.json) na memória do navegador
-    const blob = new Blob([dadosSalvos], { type: 'application/json' });
-    
-    // 2. Cria um link <a> invisível
-    const linkInvisivel = document.createElement('a');
-    
-    // 3. Aponta o link para o nosso arquivo virtual
-    linkInvisivel.href = URL.createObjectURL(blob);
-    
-    // 4. Define o nome do arquivo que será baixado
-    linkInvisivel.download = `gradflow_backup_${usuarioLogado}.json`;
-    
-    // 5. O JS clica no link!
-    linkInvisivel.click();
-});
-
-
-// Restaurar Backup
-btnImportar.addEventListener('click', function() {
-    inputImportar.click(); 
-});
-
-// usuário escolhe um arquivo do computador
-inputImportar.addEventListener('change', function(evento) {
-    const arquivo = evento.target.files[0]; // Pega o primeiro arquivo que o usuário selecionou
-
-    if (!arquivo) {
-        return;
-    }
-
-    // leitor de arquivos do JS
-    const leitor = new FileReader();
-
-
-    leitor.onload = function(e) {
-        try {
-            const conteudoDeTexto = e.target.result; 
-            
-            // Tenta transformar o texto de volta em objeto JavaScript
-            const dadosImportados = JSON.parse(conteudoDeTexto);
-
-            // Validação de Segurança
-            if (dadosImportados.password === undefined || dadosImportados.disciplinas === undefined) {
-                alert('Arquivo de backup inválido ou corrompido.');
-                return;
-            }
-
-            // salva no banco de dados do usuário atual e atualiza a tela
-            const usuarioLogado = localStorage.getItem('loggedUser');
-            localStorage.setItem(usuarioLogado, JSON.stringify(dadosImportados));
-            
-            atualizarDisciplinas();
-            alert('Backup restaurado com sucesso!');
-            
-            // Limpa o input para caso o usuário queira importar de novo depois
-            inputImportar.value = ''; 
-            
-        } catch (erro) {
-            // Se o JSON.parse falhar
-            alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo .json válido.');
-        }
-    };
-
-    
-    leitor.readAsText(arquivo);
-});
-
-
-// Salvar Alterações (Usuário e/ou Senha)
-btnSaveChanges.addEventListener('click', function() {
-    const newUser = inputNewUser.value.trim();
-    const newPass = inputNewPass.value.trim();
-    let currentUser = localStorage.getItem('loggedUser');
-    
-    // Se não digitou nada em nenhum campo
-    if (newUser === '' && newPass === '') {
-        alert('Preencha pelo menos um dos campos para salvar.');
-        return;
-    }
-
-    let alterouAlgo = false;
-
-    // Lógica de mudar USUÁRIO
-    if (newUser !== '') {
-        if (newUser === currentUser) {
-            alert('O novo usuário deve ser diferente do atual!');
-            return; 
-        }
-        if (localStorage.getItem(newUser) !== null) {
-            alert('Este usuário já existe. Escolha outro nome!');
-            return;
-        }
-        
-        
-        const dadosSalvos = localStorage.getItem(currentUser);
-        localStorage.setItem(newUser, dadosSalvos); // Cria a nova
-        localStorage.removeItem(currentUser); // Apaga a velha
-        localStorage.setItem('loggedUser', newUser); // Atualiza a sessão
-        
-        currentUser = newUser;
-        alterouAlgo = true;
-    }
-
-    // Lógica de mudar SENHA
-    if (newPass !== '') {
-        
-        const dadosSalvos = JSON.parse(localStorage.getItem(currentUser));
-        
-        dadosSalvos.password = newPass; // Troca a senha
-        
-        // Empacota de volta
-        localStorage.setItem(currentUser, JSON.stringify(dadosSalvos));
-        alterouAlgo = true;
-    }
-
-    
-    if (alterouAlgo) {
-        inputNewUser.value = '';
-        inputNewPass.value = '';
-        alert('Alterações salvas com sucesso!');
-        modalSettings.style.display = 'none'; 
-    }
-});
-
-
 // ---------------------------------------------------------
 // LÓGICA DE EDITAR DISCIPLINA
 // ---------------------------------------------------------
-let indiceEdicao = null;
-
-// Variáveis do DOM (Certifique-se de que o ID do HTML bate com esses aqui)
-const inputEditName = document.getElementById('input-edit-nome');
-const inputEditLimite = document.getElementById('input-edit-limite');
-const editModal = document.getElementById('edit-modal');
-const btnSaveEdit = document.getElementById('btn-save-edit');
-const btnCancelEdit = document.getElementById('btn-cancel-edit');
 
 function abrirModalEditar(index) {
     indiceEdicao = index;
-
-    // Pega os dados do banco
-    const usuarioLogado = localStorage.getItem('loggedUser'); // Corrigido para usuarioLogado
+    const usuarioLogado = localStorage.getItem('loggedUser');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
     const materia = dadosSalvos.disciplinas[index];
 
-    // Preenche os campos
     inputEditName.value = materia.nome;
     inputEditLimite.value = materia.limite;
-
-    // Abre o modal
     editModal.style.display = 'flex';
 }
 
@@ -569,17 +380,12 @@ btnSaveEdit.addEventListener('click', function(){
     const usuarioLogado = localStorage.getItem('loggedUser');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     
-    // Atualiza a matéria específica
     dadosSalvos.disciplinas[indiceEdicao].nome = newNomeDisciplina;
     dadosSalvos.disciplinas[indiceEdicao].limite = parseInt(newLimiteDisciplina);
 
-    // Salva no banco de volta
     localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
-    // Atualiza a tela
     atualizarDisciplinas();
 
-    // Fecha o modal (usando a variável correta)
     editModal.style.display = 'none';
     indiceEdicao = null;
 });
@@ -587,4 +393,119 @@ btnSaveEdit.addEventListener('click', function(){
 btnCancelEdit.addEventListener('click', function(){
     editModal.style.display = 'none';
     indiceEdicao = null;
+});
+
+
+// ---------------------------------------------------------
+// CONFIGURAÇÕES, BACKUP E LOGOUT
+// ---------------------------------------------------------
+
+btnSettings.addEventListener('click', function(){
+    modalSettings.style.display = 'flex';
+});
+
+btnCloseSettings.addEventListener('click', function(){
+    modalSettings.style.display = 'none';
+});
+
+btnLogout.addEventListener('click', function(){
+    localStorage.removeItem('loggedUser');
+    appView.style.display = 'none';
+    authView.style.display = 'flex';
+    modalSettings.style.display = 'none';
+});
+
+btnExportar.addEventListener('click', function() {
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = localStorage.getItem(usuarioLogado); 
+    const blob = new Blob([dadosSalvos], { type: 'application/json' });
+    const linkInvisivel = document.createElement('a');
+    linkInvisivel.href = URL.createObjectURL(blob);
+    linkInvisivel.download = `gradflow_backup_${usuarioLogado}.json`;
+    linkInvisivel.click();
+});
+
+btnImportar.addEventListener('click', function() {
+    inputImportar.click(); 
+});
+
+inputImportar.addEventListener('change', function(evento) {
+    const arquivo = evento.target.files[0]; 
+    if (!arquivo) return;
+
+    const leitor = new FileReader();
+    leitor.onload = function(e) {
+        try {
+            const conteudoDeTexto = e.target.result; 
+            const dadosImportados = JSON.parse(conteudoDeTexto);
+
+            if (dadosImportados.password === undefined || dadosImportados.disciplinas === undefined) {
+                alert('Arquivo de backup inválido ou corrompido.');
+                return;
+            }
+
+            
+            dadosImportados.disciplinas.forEach(disc => {
+                if (!disc.atividades) {
+                    disc.atividades = [];
+                }
+            });
+
+            const usuarioLogado = localStorage.getItem('loggedUser');
+            localStorage.setItem(usuarioLogado, JSON.stringify(dadosImportados));
+            
+            atualizarDisciplinas();
+            alert('Backup restaurado com sucesso!');
+            inputImportar.value = ''; 
+        } catch (erro) {
+            alert('Erro ao ler o arquivo. Certifique-se de que é um arquivo .json válido.');
+        }
+    };
+    leitor.readAsText(arquivo);
+});
+
+btnSaveChanges.addEventListener('click', function() {
+    const newUser = inputNewUser.value.trim();
+    const newPass = inputNewPass.value.trim();
+    let currentUser = localStorage.getItem('loggedUser');
+    
+    if (newUser === '' && newPass === '') {
+        alert('Preencha pelo menos um dos campos para salvar.');
+        return;
+    }
+
+    let alterouAlgo = false;
+
+    if (newUser !== '') {
+        if (newUser === currentUser) {
+            alert('O novo usuário deve ser diferente do atual!');
+            return; 
+        }
+        if (localStorage.getItem(newUser) !== null) {
+            alert('Este usuário já existe. Escolha outro nome!');
+            return;
+        }
+        
+        const dadosSalvos = localStorage.getItem(currentUser);
+        localStorage.setItem(newUser, dadosSalvos); 
+        localStorage.removeItem(currentUser); 
+        localStorage.setItem('loggedUser', newUser); 
+        
+        currentUser = newUser;
+        alterouAlgo = true;
+    }
+
+    if (newPass !== '') {
+        const dadosSalvos = JSON.parse(localStorage.getItem(currentUser));
+        dadosSalvos.password = newPass; 
+        localStorage.setItem(currentUser, JSON.stringify(dadosSalvos));
+        alterouAlgo = true;
+    }
+
+    if (alterouAlgo) {
+        inputNewUser.value = '';
+        inputNewPass.value = '';
+        alert('Alterações salvas com sucesso!');
+        modalSettings.style.display = 'none'; 
+    }
 });

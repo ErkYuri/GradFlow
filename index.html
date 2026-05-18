@@ -73,22 +73,20 @@
                 <div id="view-faltas">
                     <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Faltas</h2>
 
-                    <div class="add-subject">
-                        <input id="input-disciplina" type="text" placeholder="Disciplina">
-                        <input id="input-limite" type="number" placeholder="Max. Faltas">
-
-                        <button id="btn-add-disciplina">Adicionar</button>
-                    </div>
-
                     <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar disciplina...">
 
                     <div id="lista-disciplinas" class="disciplinas"></div>
                 </div>
                 
                 <div id="view-notas" style="display: none;">
-                    <h2 style="text-align: center; color: var(--brand-color)">Minhas Notas</h2>
+                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Notas</h2>
 
                     <p style="text-align: center; color: #777;">Em construção...</p>
+                </div>
+
+                <div id="view-eventos" style="display: none;">
+                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Meus Eventos</h2>
+                    <p style="text-align: center; color: #777;">Em construção... 🚧</p>
                 </div>
 
             </article>
@@ -98,6 +96,7 @@
                 <ul>
                     <li><button id="nav-faltas" class="nav-btn-active">Faltas</button></li>
                     <li><button id="nav-notas" class="nav-btn">Notas</button></li>
+                    <li><button id="nav-eventos" class="nav-btn">Eventos</button></li>
                 </ul>
             </nav>
 
@@ -141,6 +140,28 @@
 
                     <button id="btn-save-edit">Salvar</button>
                     <button id="btn-cancel-edit" class="btn-secondary">Cancelar</button>
+                </div>
+            </div>
+
+            <div id="fab-overlay" style="display: none;"></div>
+
+            <div id="fab-container">
+                <div id="fab-menu" style="display: none;">
+                    <button id="btn-fab-disciplina">📚 Nova Disciplina</button>
+                    <button id="btn-fab-evento">📅 Novo Evento</button>
+                </div>
+                <button id="fab-main">+</button>
+            </div>
+
+            <div id="create-disciplina-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h2>Nova Disciplina</h2>
+                    <div class="edit-inputs">
+                        <input type="text" id="input-create-nome" placeholder="Nome da Disciplina">
+                        <input type="number" id="input-create-limite" placeholder="Limite de Faltas">
+                    </div>
+                    <button id="btn-save-new-disciplina" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 16px;">Criar Disciplina</button>
+                    <button id="btn-cancel-new-disciplina" class="btn-secondary" style="margin-top: 8px;">Cancelar</button>
                 </div>
             </div>
 
