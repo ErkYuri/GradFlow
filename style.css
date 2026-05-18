@@ -66,13 +66,27 @@ input {
 }
 
 .btn-primary {
-    font-size: 16px;
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
     background-color: var(--brand-color);
     color: #ffffff;
     border-radius: 8px;
     border: none;
     width: 100%;
-    padding: 10px;
+    padding: 14px;
+}
+
+.btn-secondary { 
+    width: 100%; 
+    font-size: 14px;
+    padding: 14px; 
+    background: #ccc; 
+    color: #333; 
+    border: none; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    cursor: pointer; 
 }
 
 .btn-show-register {
@@ -91,6 +105,8 @@ input {
     width: 100%;
     padding: 8px;
 }
+
+
 
 
 /*-------------------------------------------- TELA INICIAL --------------------------------------------------*/
@@ -178,6 +194,13 @@ header h1 {
 }
 
 .edit-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.nota-inputs {
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -279,16 +302,6 @@ header h1 {
     cursor: pointer; 
 }
 
-.btn-secondary { 
-    width: 100%; 
-    padding: 14px; 
-    background: #ccc; 
-    color: #333; 
-    border: none; 
-    border-radius: 8px; 
-    font-weight: bold; 
-    cursor: pointer; 
-}
 
 
 /* --- FAB (Floating Action Button) --- */

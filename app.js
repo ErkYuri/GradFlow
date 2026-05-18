@@ -7,12 +7,12 @@ const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
 const viewFaltas = document.getElementById('view-faltas');
 const viewNotas = document.getElementById('view-notas');
-const viewEventos = document.getElementById('view-eventos'); // NOVA TELA
+const viewEventos = document.getElementById('view-eventos');
 
 // Navegação Inferior
 const navFaltas = document.getElementById('nav-faltas');
 const navNotas = document.getElementById('nav-notas');
-const navEventos = document.getElementById('nav-eventos'); // NOVO BOTÃO
+const navEventos = document.getElementById('nav-eventos');
 
 // Autenticação
 const formLogin = document.getElementById('form-login');
@@ -35,6 +35,7 @@ const btnSaveChanges = document.getElementById('btn-save-changes');
 // Pesquisa e Listagem
 const inputPesquisa = document.getElementById('input-pesquisa');
 const ListaDisciplinas = document.getElementById('lista-disciplinas');
+const ListaNotas = document.getElementById('lista-notas');
 
 // Botão Flutuante e Modal de Criação
 const fabMain = document.getElementById('fab-main');
@@ -44,6 +45,8 @@ const btnFabEvento = document.getElementById('btn-fab-evento');
 
 const createDisciplinaModal = document.getElementById('create-disciplina-modal');
 const inputCreateNome = document.getElementById('input-create-nome');
+const inputCreateProfessor = document.getElementById('input-create-professor');
+const inputCreateSala = document.getElementById('input-create-sala');
 const inputCreateLimite = document.getElementById('input-create-limite');
 const btnSaveNewDisciplina = document.getElementById('btn-save-new-disciplina');
 const btnCancelNewDisciplina = document.getElementById('btn-cancel-new-disciplina');
@@ -52,9 +55,19 @@ const btnCancelNewDisciplina = document.getElementById('btn-cancel-new-disciplin
 let indiceEdicao = null;
 const editModal = document.getElementById('edit-modal');
 const inputEditName = document.getElementById('input-edit-nome');
+const inputEditProfessor = document.getElementById('input-edit-professor');
+const inputEditSala = document.getElementById('input-edit-sala');
 const inputEditLimite = document.getElementById('input-edit-limite');
 const btnSaveEdit = document.getElementById('btn-save-edit');
 const btnCancelEdit = document.getElementById('btn-cancel-edit');
+
+// Modal de Nova Nota
+let indiceMateriaParaNota = null;
+const modalNovaNota = document.getElementById('modal-nova-nota');
+const inputNotaNome = document.getElementById('input-nota-nome');
+const inputNotaValor = document.getElementById('input-nota-valor');
+const btnSaveNota = document.getElementById('btn-save-nota');
+const btnCancelNota = document.getElementById('btn-cancel-nota');
 
 
 // ---------------------------------------------------------
@@ -80,6 +93,7 @@ navNotas.addEventListener('click', function(){
     esconderTodasAsTelas();
     viewNotas.style.display = 'block';
     navNotas.className = 'nav-btn-active';
+    atualizarNotas();
 });
 
 navEventos.addEventListener('click', function(){
@@ -103,6 +117,7 @@ btnCancelRegister.addEventListener('click', function(){
     formLogin.style.display = 'flex';
 });
 
+// FORMULARIO CADASTRO USUARIO
 formRegister.addEventListener('submit', function(evento) {
     evento.preventDefault();
 
@@ -131,6 +146,8 @@ formRegister.addEventListener('submit', function(evento) {
     formLogin.style.display = 'flex';
 });
 
+
+// FORMULARIO LOGIN
 formLogin.addEventListener('submit', function(evento){
     evento.preventDefault(); 
 
@@ -205,6 +222,8 @@ btnCancelNewDisciplina.addEventListener('click', function() {
 // Salva a nova disciplina
 btnSaveNewDisciplina.addEventListener('click', function(){
     const nomeDisciplina = inputCreateNome.value.trim();
+    const professor = inputCreateProfessor.value.trim();
+    const sala = inputCreateSala.value.trim();
     const limiteFaltas = inputCreateLimite.value;
 
     if(nomeDisciplina === '' || limiteFaltas === ''){
@@ -217,6 +236,8 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 
     const novaDisciplina = {
         nome: nomeDisciplina,
+        professor: professor,
+        sala: sala,
         limite: parseInt(limiteFaltas),
         faltas: 0,
         atividades: [] 
@@ -226,6 +247,8 @@ btnSaveNewDisciplina.addEventListener('click', function(){
     localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
 
     inputCreateNome.value = '';
+    inputCreateProfessor.value = '';
+    inputCreateSala.value = '';
     inputCreateLimite.value = '';
 
     createDisciplinaModal.style.display = 'none';
@@ -234,7 +257,7 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 
 
 // ---------------------------------------------------------
-// RENDERIZAÇÃO E FILTRO (TELA DE FALTAS)
+// RENDERIZAÇÃO E FILTRO 
 // ---------------------------------------------------------
 
 function atualizarDisciplinas(termoPesquisa = ''){
@@ -292,6 +315,9 @@ function atualizarDisciplinas(termoPesquisa = ''){
         });
     }
 }
+
+
+
 
 inputPesquisa.addEventListener('input', function(evento){
     const textoDigitado = evento.target.value;
@@ -352,6 +378,23 @@ function calcularGradiente(perc) {
     return `rgb(${r},${g},${b})`;
 }
 
+function calcularGradienteNota(nota) {
+    let r, g, b;
+
+    if (nota <= 50) {
+        const ratio = nota / 50;
+        r = 255;
+        g = Math.round(255 * ratio); // Vai subindo o verde (vira amarelo)
+        b = 0;
+    } else {
+        const ratio = (nota - 50) / 50;
+        r = Math.round(255 - (255 * ratio)); // Vai tirando o vermelho (vira verde)
+        g = 200; 
+        b = 0;
+    }
+    return `rgb(${r},${g},${b})`;
+}
+
 
 // ---------------------------------------------------------
 // LÓGICA DE EDITAR DISCIPLINA
@@ -364,12 +407,16 @@ function abrirModalEditar(index) {
     const materia = dadosSalvos.disciplinas[index];
 
     inputEditName.value = materia.nome;
+    inputEditProfessor.value = materia.professor;
+    inputEditSala.value = materia.sala;
     inputEditLimite.value = materia.limite;
     editModal.style.display = 'flex';
 }
 
 btnSaveEdit.addEventListener('click', function(){
     const newNomeDisciplina = inputEditName.value.trim();
+    const newProfessor = inputEditProfessor.value.trim();
+    const newSala = inputEditSala.value.trim();
     const newLimiteDisciplina = inputEditLimite.value;
     
     if (newNomeDisciplina === '' || newLimiteDisciplina === '') {
@@ -381,6 +428,8 @@ btnSaveEdit.addEventListener('click', function(){
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     
     dadosSalvos.disciplinas[indiceEdicao].nome = newNomeDisciplina;
+    dadosSalvos.disciplinas[indiceEdicao].professor = newProfessor;
+    dadosSalvos.disciplinas[indiceEdicao].sala = newSala;
     dadosSalvos.disciplinas[indiceEdicao].limite = parseInt(newLimiteDisciplina);
 
     localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
@@ -394,6 +443,131 @@ btnCancelEdit.addEventListener('click', function(){
     editModal.style.display = 'none';
     indiceEdicao = null;
 });
+
+
+// --- ESQUELETOS DOS MODAIS DE NOTAS ---
+function abrirModalNovaNota(index) {
+    indiceMateriaParaNota = index;
+
+    inputNotaNome.value = '';
+    inputNotaValor.value = '';
+
+    modalNovaNota.style.display='flex';
+    
+}
+
+btnSaveNota.addEventListener('click', function(){
+
+    const novaNotaNome = inputNotaNome.value.trim();
+    const novaNotaValor = inputNotaValor.value;
+
+    if (novaNotaNome === '' || novaNotaValor === ''){
+        alert('Favor preencher os campos');
+        return;
+    }
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    const novaNota = {
+        nome: novaNotaNome,
+        nota: parseFloat(novaNotaValor)
+    }
+
+    dadosSalvos.disciplinas[indiceMateriaParaNota].atividades.push(novaNota);
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    modalNovaNota.style.display='none';
+    indiceMateriaParaNota = null;
+
+    atualizarNotas();
+});
+
+btnCancelNota.addEventListener('click', function(){
+
+    modalNovaNota.style.display='none';
+    indiceMateriaParaNota = null;
+});
+
+function abrirModalHistorico(index) {
+    alert("Em breve: Modal para ver a lista de notas da matéria " + index);
+}
+
+// RENDERIZAR TELA DE NOTAS
+
+function atualizarNotas(termoPesquisa = ''){
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    if(!usuarioLogado) return;
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    ListaNotas.innerHTML = '';
+
+    const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
+        const nomeMateria = disciplina.nome.toLowerCase();
+        const textoPesquisado = termoPesquisa.toLowerCase();
+        return nomeMateria.includes(textoPesquisado);
+    });
+
+    if(disciplinasFiltradas.length === 0){
+        ListaNotas.innerHTML = `
+            <div style="text-align: center; margin-top: 40px; color: #777;">
+                <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
+                <p>Nenhuma disciplina encontrada.<br>Adicione no botão + abaixo!</p>
+            </div>
+        `;
+    } else {
+        disciplinasFiltradas.forEach(function(disciplina, index) {
+            
+            
+            let notaTotal = 0;
+
+            // Verifica se existem atividades antes de somar
+            if (disciplina.atividades && disciplina.atividades.length > 0) {
+                disciplina.atividades.forEach(function(ativ) {
+                    notaTotal += parseFloat(ativ.nota);
+                });
+            }
+
+            // Trava a barra visual em 100% (caso o aluno tenha ponto extra e tire 102, a barra não vaza da tela)
+            let porcentagemNota = notaTotal > 100 ? 100 : notaTotal;
+            const corBarraNota = calcularGradienteNota(porcentagemNota);
+
+            // Monta o subtítulo Professor e Sala
+            let subtituloHTML = '';
+            if (disciplina.professor || disciplina.sala) {
+                let prof = disciplina.professor ? `Prof. ${disciplina.professor}` : '';
+                let sala = disciplina.sala ? `Sala ${disciplina.sala}` : '';
+                let separador = (prof && sala) ? ' - ' : ''; // Só põe o tracinho se tiver os dois
+                subtituloHTML = `<p style="margin: 4px 0 12px 0; color: #777; font-size: 14px; text-transform: capitalize;">${prof}${separador}${sala}</p>`;
+            }
+
+        
+            const cardHTML = `
+                <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+                    
+                    <button onclick="abrirModalEditar(${index})" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; cursor: pointer; font-size: 18px;" title="Editar Disciplina">✏️</button>
+
+                    <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 30px;">${disciplina.nome}</h3>
+                    
+                    ${subtituloHTML}
+
+                    <p style="margin: 8px 0; color: #555; font-weight: bold; font-size: 18px;">Nota Total: ${notaTotal} <span style="font-size: 14px; font-weight: normal; color: #888;">/ 100</span></p>
+
+                    <div style="width: 100%; background: #eee; border-radius: 10px; height: 12px; margin-bottom: 16px; overflow: hidden;">
+                        <div style="height: 100%; background: ${corBarraNota}; width: ${porcentagemNota}%; transition: width 0.5s ease, background-color 0.5s ease;"></div>
+                    </div>
+
+                    <div style="display: flex; gap: 8px;">
+                        <button onclick="abrirModalNovaNota(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Nota</button>
+                        <button onclick="abrirModalHistorico(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: #eee; font-weight: bold; color: #333; cursor: pointer;">Histórico</button>
+                    </div>
+                </div>
+            `;
+            ListaNotas.innerHTML += cardHTML;
+        });
+    }
+}
+
 
 
 // ---------------------------------------------------------
@@ -509,3 +683,5 @@ btnSaveChanges.addEventListener('click', function() {
         modalSettings.style.display = 'none'; 
     }
 });
+
+
