@@ -102,23 +102,17 @@
                     </div>
 
                     
-                    <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 1px;">
-                        <p style="margin: 0 0 8px 0; font-weight: bold; color: #555; font-size: 14px;">Alterar Usuário</p>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="text" id="input-new-user" placeholder="Novo nome de usuário" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-                            <button id="btn-change-user" style="padding: 10px 16px; background: var(--brand-color); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Salvar</button>
+                    <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 8px;">
+                        <p style="margin: 0 0 12px 0; font-weight: bold; color: #555; font-size: 14px;">Dados da Conta</p>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            <input type="text" id="input-new-user" placeholder="Novo nome de usuário" style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; width: 100%;">
+                            
+                            <input type="password" id="input-new-pass" placeholder="Nova senha" style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; width: 100%;">
                         </div>
                     </div>
 
-        
-
-                    <div style="padding-top: 16px;">
-                        <p style="margin: 0 0 8px 0; font-weight: bold; color: #555; font-size: 14px;">Alterar Senha</p>
-                        <div style="display: flex; gap: 8px;">
-                            <input type="password" id="input-new-pass" placeholder="Digite a nova senha" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 8px;">
-                            <button id="btn-change-pass" style="padding: 10px 16px; background: var(--brand-color); color: #fff; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Salvar</button>
-                        </div>
-                    </div>
+                    <button id="btn-save-changes" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">Salvar Alterações</button>
 
                     <button id="btn-logout" class="btn-danger">Sair da Conta</button>
                     <button id="btn-close-settings" class="btn-secondary">Fechar</button>

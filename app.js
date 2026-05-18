@@ -27,11 +27,11 @@ const inputImportar = document.getElementById('input-importar');
 
 // variaveis para alterar senha
 const inputNewPass = document.getElementById('input-new-pass');
-const btnChangePass = document.getElementById('btn-change-pass');
 
 // variaveis para alterar usuario
 const inputNewUser = document.getElementById('input-new-user');
-const btnChangeUser = document.getElementById('btn-change-user');
+
+const btnSaveChanges = document.getElementById('btn-save-changes');
 
 
 // ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
@@ -408,54 +408,58 @@ inputImportar.addEventListener('change', function(evento) {
 });
 
 
-// alterar senha
-btnChangePass.addEventListener('click', function(){
-    const newPass = inputNewPass.value.trim();
-
-    if(newPass === ''){
-        alert('Informe a nova senha');
-        return;
-    } 
-
-    const usuarioLogado = localStorage.getItem('loggedUser');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-    
-    dadosSalvos.password = newPass;
-
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
-    inputNewPass.value= '';
-
-    alert('Senha alterada');
-});
-
-
-// alterar nome de usuário
-btnChangeUser.addEventListener('click', function(){
+// Salvar Alterações (Usuário e/ou Senha)
+btnSaveChanges.addEventListener('click', function() {
     const newUser = inputNewUser.value.trim();
-    const currentUser = localStorage.getItem('loggedUser');
-
-    // validações de segurança
-    if(newUser === ''){
-        alert('Informe o novo nome de usuário');
-        return;
-    }
-    if(newUser === currentUser){
-        alert('Este já é o seu usuário atual!');
-        return;
-    }
-    if(localStorage.getItem(newUser) !== null){
-        alert('Este usuário já existe. Escolha outro nome!');
-        return;
-    }
-
-    const dadosSalvos = localStorage.getItem(currentUser); 
+    const newPass = inputNewPass.value.trim();
+    let currentUser = localStorage.getItem('loggedUser');
     
-    localStorage.setItem(newUser, dadosSalvos);
-    localStorage.removeItem(currentUser);
-    
-    localStorage.setItem('loggedUser', newUser); 
+    // Se não digitou nada em nenhum campo
+    if (newUser === '' && newPass === '') {
+        alert('Preencha pelo menos um dos campos para salvar.');
+        return;
+    }
 
-    inputNewUser.value = '';
-    alert('Usuário alterado com sucesso!');
+    let alterouAlgo = false;
+
+    // Lógica de mudar USUÁRIO
+    if (newUser !== '') {
+        if (newUser === currentUser) {
+            alert('O novo usuário deve ser diferente do atual!');
+            return; 
+        }
+        if (localStorage.getItem(newUser) !== null) {
+            alert('Este usuário já existe. Escolha outro nome!');
+            return;
+        }
+        
+        
+        const dadosSalvos = localStorage.getItem(currentUser);
+        localStorage.setItem(newUser, dadosSalvos); // Cria a nova
+        localStorage.removeItem(currentUser); // Apaga a velha
+        localStorage.setItem('loggedUser', newUser); // Atualiza a sessão
+        
+        currentUser = newUser;
+        alterouAlgo = true;
+    }
+
+    // Lógica de mudar SENHA
+    if (newPass !== '') {
+        
+        const dadosSalvos = JSON.parse(localStorage.getItem(currentUser));
+        
+        dadosSalvos.password = newPass; // Troca a senha
+        
+        // Empacota de volta
+        localStorage.setItem(currentUser, JSON.stringify(dadosSalvos));
+        alterouAlgo = true;
+    }
+
+    
+    if (alterouAlgo) {
+        inputNewUser.value = '';
+        inputNewPass.value = '';
+        alert('Alterações salvas com sucesso!');
+        modalSettings.style.display = 'none'; 
+    }
 });
