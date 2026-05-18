@@ -71,13 +71,15 @@
             <!-- Conteudo dinamico -->
             <article id="content-area">
                 <div class="add-subject">
-                    <input id="input-disciplina" type="text" placeholder="Nome da disciplina">
-                    <input id="input-limite" type="number" placeholder="Limite de faltas">
+                    <input id="input-disciplina" type="text" placeholder="Disciplina">
+                    <input id="input-limite" type="number" placeholder="Max. Faltas">
+
                     <button id="btn-add-disciplina">Adicionar</button>
                 </div>
 
+                <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar disciplina...">
+
                 <div id="lista-disciplinas" class="disciplinas">
-                
                 </div>
 
             </article>
@@ -116,6 +118,20 @@
 
                     <button id="btn-logout" class="btn-danger">Sair da Conta</button>
                     <button id="btn-close-settings" class="btn-secondary">Fechar</button>
+                </div>
+            </div>
+
+            <div id="edit-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h2>Editar Disciplina</h2>
+
+                    <div class="edit-inputs">
+                        <input type="text" id="input-edit-nome" placeholder="Nome da Disciplina">
+                        <input type="number" id="input-edit-limite" placeholder="Limite de Faltas">
+                    </div>
+
+                    <button id="btn-save-edit">Salvar</button>
+                    <button id="btn-cancel-edit" class="btn-secondary">Cancelar</button>
                 </div>
             </div>
 

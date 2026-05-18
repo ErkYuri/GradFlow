@@ -30,8 +30,13 @@ const inputNewPass = document.getElementById('input-new-pass');
 
 // variaveis para alterar usuario
 const inputNewUser = document.getElementById('input-new-user');
-
 const btnSaveChanges = document.getElementById('btn-save-changes');
+
+
+// variavel para barra de pesquisa
+const inputPesquisa = document.getElementById('input-pesquisa');
+
+
 
 
 // ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
@@ -180,7 +185,7 @@ btnAddDisciplina.addEventListener('click', function(){
 
 const ListaDisciplinas = document.getElementById('lista-disciplinas');
 
-function atualizarDisciplinas(){
+function atualizarDisciplinas(termoPesquisa = ''){
 
     // verificar user logado
     const usuarioLogado = localStorage.getItem('loggedUser');
@@ -192,42 +197,68 @@ function atualizarDisciplinas(){
     // limpa tela antes de renderizar
     ListaDisciplinas.innerHTML = '';
 
-    dadosSalvos.disciplinas.forEach(function(disciplina, index) {
-        // 1. Regra de 3 e Cor
-        const porcentagemFaltas = (disciplina.faltas / disciplina.limite) * 100;
-        const corBarra = calcularGradiente(porcentagemFaltas);
+    const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
+        const nomeMateria = disciplina.nome.toLowerCase();
+        const textoPesquisado = termoPesquisa.toLowerCase();
+        return nomeMateria.includes(textoPesquisado);
+    })
 
-        // 2. Lógica do Aviso
-        let avisoHTML = '';
-        if (porcentagemFaltas >= 100) {
-            avisoHTML = `<p style="color: #cc0000; font-weight: bold; font-size: 13px; margin-top: 8px;">⛔ Limite de faltas atingido!</p>`;
-        } else if (porcentagemFaltas >= 80) {
-            avisoHTML = `<p style="color: #e6a700; font-weight: bold; font-size: 13px; margin-top: 8px;">⚠️ Atenção: 80% do limite atingido.</p>`;
-        }
-
-        // 3. Atualizando o HTML do Card
-        const cardHTML = `
-            <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <h3 style="margin-top: 0; color: var(--brand-color);">${disciplina.nome}</h3>
-                <p style="margin: 8px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
-                
-                <div style="width: 100%; background: #eee; border-radius: 10px; height: 10px; margin-bottom: 8px; overflow: hidden;">
-                    <div style="height: 100%; background: ${corBarra}; width: ${porcentagemFaltas}%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
-                </div>
-
-                ${avisoHTML}
-
-                <div style="display: flex; gap: 8px; margin-top: 12px;">
-                    <button onclick="adicionarFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Falta</button>
-                    <button onclick="removerFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">- Falta</button>
-                    <button onclick="excluirDisciplina(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #480000; color: #fff; font-weight: bold; cursor: pointer;">Excluir</button>
-                </div>
+    if(disciplinasFiltradas.length === 0){
+        // Se estiver vazia, INJETA o HTML da mensagem
+        ListaDisciplinas.innerHTML = `
+            <div style="text-align: center; margin-top: 40px; color: #777;">
+                <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
+                <p>Nenhuma disciplina cadastrada.<br>Adicione sua primeira matéria acima!</p>
             </div>
         `;
+    } else {
+        
+        disciplinasFiltradas.forEach(function(disciplina, index) {
+            // 1. Regra de 3 e Cor
+            const porcentagemFaltas = (disciplina.faltas / disciplina.limite) * 100;
+            const corBarra = calcularGradiente(porcentagemFaltas);
 
-        ListaDisciplinas.innerHTML += cardHTML;
-    });
+            // 2. Lógica do Aviso
+            let avisoHTML = '';
+            if (porcentagemFaltas >= 100) {
+                avisoHTML = `<p style="color: #cc0000; font-weight: bold; font-size: 13px; margin-top: 8px;">⛔ Limite de faltas atingido!</p>`;
+            } else if (porcentagemFaltas >= 80) {
+                avisoHTML = `<p style="color: #e6a700; font-weight: bold; font-size: 13px; margin-top: 8px;">⚠️ Atenção: 80% do limite atingido.</p>`;
+            }
+
+            // 3. Atualizando o HTML do Card
+            const cardHTML = `
+                <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <h3 style="margin-top: 0; color: var(--brand-color);">${disciplina.nome}</h3>
+                    <p style="margin: 8px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
+                    
+                    <div style="width: 100%; background: #eee; border-radius: 10px; height: 10px; margin-bottom: 8px; overflow: hidden;">
+                        <div style="height: 100%; background: ${corBarra}; width: ${porcentagemFaltas}%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
+                    </div>
+
+                    ${avisoHTML}
+
+                    <div style="display: flex; gap: 8px; margin-top: 12px;">
+                        <button onclick="adicionarFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Falta</button>
+                        <button onclick="removerFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">- Falta</button>
+                        <button onclick="abrirModalEditar(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #e6a700; color: #222; font-weight: bold; cursor: pointer;">Editar</button>
+                        <button onclick="excluirDisciplina(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #480000; color: #fff; font-weight: bold; cursor: pointer;">Excluir</button>
+                    </div>
+                </div>
+            `;
+
+            ListaDisciplinas.innerHTML += cardHTML;
+        });
+    }
+
+    
 }
+
+
+inputPesquisa.addEventListener('input', function(evento){
+    const textoDigitado = evento.target.value;
+    atualizarDisciplinas(textoDigitado);
+});
 
 
 
@@ -462,4 +493,66 @@ btnSaveChanges.addEventListener('click', function() {
         alert('Alterações salvas com sucesso!');
         modalSettings.style.display = 'none'; 
     }
+});
+
+
+// ---------------------------------------------------------
+// LÓGICA DE EDITAR DISCIPLINA
+// ---------------------------------------------------------
+let indiceEdicao = null;
+
+// Variáveis do DOM (Certifique-se de que o ID do HTML bate com esses aqui)
+const inputEditName = document.getElementById('input-edit-nome');
+const inputEditLimite = document.getElementById('input-edit-limite');
+const editModal = document.getElementById('edit-modal');
+const btnSaveEdit = document.getElementById('btn-save-edit');
+const btnCancelEdit = document.getElementById('btn-cancel-edit');
+
+function abrirModalEditar(index) {
+    indiceEdicao = index;
+
+    // Pega os dados do banco
+    const usuarioLogado = localStorage.getItem('loggedUser'); // Corrigido para usuarioLogado
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    const materia = dadosSalvos.disciplinas[index];
+
+    // Preenche os campos
+    inputEditName.value = materia.nome;
+    inputEditLimite.value = materia.limite;
+
+    // Abre o modal
+    editModal.style.display = 'flex';
+}
+
+btnSaveEdit.addEventListener('click', function(){
+    const newNomeDisciplina = inputEditName.value.trim();
+    const newLimiteDisciplina = inputEditLimite.value;
+    
+    if (newNomeDisciplina === '' || newLimiteDisciplina === '') {
+        alert('Preencha todos os campos!');
+        return;
+    }
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    
+    // Atualiza a matéria específica
+    dadosSalvos.disciplinas[indiceEdicao].nome = newNomeDisciplina;
+    dadosSalvos.disciplinas[indiceEdicao].limite = parseInt(newLimiteDisciplina);
+
+    // Salva no banco de volta
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    // Atualiza a tela
+    atualizarDisciplinas();
+
+    // Fecha o modal (usando a variável correta)
+    editModal.style.display = 'none';
+    indiceEdicao = null;
+});
+
+btnCancelEdit.addEventListener('click', function(){
+    editModal.style.display = 'none';
+    indiceEdicao = null;
 });
