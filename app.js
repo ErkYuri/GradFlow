@@ -1,3 +1,14 @@
+// ---------------------------------------------------------
+// VARIAVEIS
+// ---------------------------------------------------------
+
+// variaveis para troca de telas
+const viewFaltas = document.getElementById('view-faltas');
+const viewNotas = document.getElementById('view-notas');
+
+const navFaltas = document.getElementById('nav-faltas');
+const navNotas = document.getElementById('nav-notas');
+
 // variaveis para autenticacao do usuario
 const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
@@ -37,7 +48,28 @@ const btnSaveChanges = document.getElementById('btn-save-changes');
 const inputPesquisa = document.getElementById('input-pesquisa');
 
 
+// ---------------------------------------------------------
+// NAVEGACAO DE TELAS
+// ---------------------------------------------------------
 
+// tela de notas
+navNotas.addEventListener('click', function(){
+
+    viewFaltas.style.display='none';
+    viewNotas.style.display='block';
+
+    navNotas.className='nav-btn-active';
+    navFaltas.className='nav-btn';
+});
+
+navFaltas.addEventListener('click', function(){
+
+    viewNotas.style.display='none';
+    viewFaltas.style.display='block';
+
+    navFaltas.className='nav-btn-active';
+    navNotas.className='nav-btn';
+});
 
 // ------------------------------------------ LOGICAS DO APLICATIVO ------------------------------------------------------
 

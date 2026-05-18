@@ -70,16 +70,25 @@
 
             <!-- Conteudo dinamico -->
             <article id="content-area">
-                <div class="add-subject">
-                    <input id="input-disciplina" type="text" placeholder="Disciplina">
-                    <input id="input-limite" type="number" placeholder="Max. Faltas">
+                <div id="view-faltas">
+                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Faltas</h2>
 
-                    <button id="btn-add-disciplina">Adicionar</button>
+                    <div class="add-subject">
+                        <input id="input-disciplina" type="text" placeholder="Disciplina">
+                        <input id="input-limite" type="number" placeholder="Max. Faltas">
+
+                        <button id="btn-add-disciplina">Adicionar</button>
+                    </div>
+
+                    <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar disciplina...">
+
+                    <div id="lista-disciplinas" class="disciplinas"></div>
                 </div>
+                
+                <div id="view-notas" style="display: none;">
+                    <h2 style="text-align: center; color: var(--brand-color)">Minhas Notas</h2>
 
-                <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar disciplina...">
-
-                <div id="lista-disciplinas" class="disciplinas">
+                    <p style="text-align: center; color: #777;">Em construção...</p>
                 </div>
 
             </article>
