@@ -200,8 +200,19 @@ formLogin.addEventListener('submit', function(evento){
     localStorage.setItem('usuarioLogado', user);
     authView.style.display = 'none';
     appView.style.display = 'block';
+    renderizarSaudacao();
     atualizarDisciplinas();
 });
+
+function renderizarSaudacao() {
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const greetingElement = document.getElementById('user-greeting');
+    
+    if (usuarioLogado && greetingElement) {
+        // Altera o texto dinamicamente para o padrão moderno de apps!
+        greetingElement.innerText = `Olá, ${usuarioLogado}`;
+    }
+}
 
 
 // ---------------------------------------------------------
@@ -1103,7 +1114,7 @@ btnExportar.addEventListener('click', function() {
     const blob = new Blob([dadosSalvos], { type: 'application/json' });
     const linkInvisivel = document.createElement('a');
     linkInvisivel.href = URL.createObjectURL(blob);
-    linkInvisivel.download = `gradflow_backup_${usuarioLogado}.json`;
+    linkInvisivel.download = `mygrad_backup_${usuarioLogado}.json`;
     linkInvisivel.click();
 });
 
@@ -1191,5 +1202,13 @@ btnSaveChanges.addEventListener('click', function() {
         modalSettings.style.display = 'none'; 
     }
 });
+
+renderizarSaudacao();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log('Service Worker Registrado com Sucesso!'))
+    .catch(err => console.log('Erro ao registrar Service Worker:', err));
+}
 
 

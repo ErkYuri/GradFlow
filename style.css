@@ -132,7 +132,11 @@ header h1 {
     left: 0;
     width: 100%;
     background-color: #FFFFFF;
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.05);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+    z-index: 1000; /* Garante que ela fique sempre por cima de tudo */
+    
+    
+    padding-bottom: env(safe-area-inset-bottom, 0px); 
 }
 
 .bottom-nav ul {
@@ -146,17 +150,23 @@ header h1 {
 .nav-btn {
     background: transparent;
     border-style: none;
-    padding: 12px;
-    color: gray;
+    padding: 18px 12px; 
+    color: rgb(73, 71, 71); 
     width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
 }
 
 .nav-btn-active {
-    background: var(--brand-color);
     border-style: none;
-    padding: 12px;
+    padding: 18px 12px;
+    font-size: 14px;
     font-weight: bold;
+    color: var(--brand-color) !important; 
     background: transparent;
+    width: 100%;
 }
 
 
@@ -164,7 +174,7 @@ header h1 {
 
 #content-area {
     padding: 20px;
-    padding-bottom: 80px;
+    padding-bottom: 100px;
 }
 .add-subject {
     display: flex;
