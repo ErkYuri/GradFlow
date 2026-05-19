@@ -253,6 +253,7 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 
     createDisciplinaModal.style.display = 'none';
     atualizarDisciplinas(); 
+    atualizarNotas();
 });
 
 
@@ -493,6 +494,7 @@ function abrirModalHistorico(index) {
     alert("Em breve: Modal para ver a lista de notas da matéria " + index);
 }
 
+
 // RENDERIZAR TELA DE NOTAS
 
 function atualizarNotas(termoPesquisa = ''){
@@ -527,6 +529,15 @@ function atualizarNotas(termoPesquisa = ''){
                     notaTotal += parseFloat(ativ.nota);
                 });
             }
+            statusHTML = '';
+
+            if(notaTotal >= 60) {
+                statusHTML = `
+                <span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Aprovado</span>`
+            } else  {
+                statusHTML = `
+                <span style="background: #fff5d2; color: #9e7f01; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Pendente</span>`
+            }
 
             // Trava a barra visual em 100% (caso o aluno tenha ponto extra e tire 102, a barra não vaza da tela)
             let porcentagemNota = notaTotal > 100 ? 100 : notaTotal;
@@ -551,7 +562,7 @@ function atualizarNotas(termoPesquisa = ''){
                     
                     ${subtituloHTML}
 
-                    <p style="margin: 8px 0; color: #555; font-weight: bold; font-size: 18px;">Nota Total: ${notaTotal} <span style="font-size: 14px; font-weight: normal; color: #888;">/ 100</span></p>
+                    <p style="margin: 8px 0; color: #555; font-weight: bold; font-size: 18px;">Nota Total: ${notaTotal} <span style="font-size: 14px; font-weight: normal; color: #888;">/ 100</span> ${statusHTML}</p>
 
                     <div style="width: 100%; background: #eee; border-radius: 10px; height: 12px; margin-bottom: 16px; overflow: hidden;">
                         <div style="height: 100%; background: ${corBarraNota}; width: ${porcentagemNota}%; transition: width 0.5s ease, background-color 0.5s ease;"></div>
