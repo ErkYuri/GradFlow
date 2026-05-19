@@ -33,7 +33,7 @@
 
 
             <!-- FORMULARIO DE CADASTRO -->
-             <form id="form-register" style="display: none;">
+            <form id="form-register" style="display: none;">
 
                 <h2>Cadastre-se</h2>
 
@@ -54,18 +54,20 @@
 
                 <button type="submit" class="btn-primary">Criar Conta</button>
                 <button type="button" class="btn-cancel-register">Voltar</button>
-             </form>
+            </form>
         </section>
 
-
+        
 
         <!-- APP LOGADO-->
         <section id="app-view" style="display: none;">
 
             <!-- Header fixo do app -->
             <header>
-            <h1 id="page-title">GradFlow</h1>
-            <button id="btn-settings" style="background: transparent; border: none; font-size: 24px; cursor: pointer;">⚙️</button>
+                <h1 id="page-title">GradFlow</h1>
+                <button id="btn-settings" style="background: transparent; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                </button>
             </header>
 
             <!-- Conteudo dinamico -->
@@ -73,7 +75,7 @@
                 <div id="view-faltas">
                     <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Faltas</h2>
 
-                    <input type="text" id="input-pesquisa" placeholder="🔍 Pesquisar disciplina...">
+                    <input type="text" id="input-pesquisa" placeholder="Pesquisar disciplina...">
 
                     <div id="lista-disciplinas" class="disciplinas"></div>
                 </div>
@@ -104,6 +106,7 @@
                 </ul>
             </nav>
 
+            <!-- MODAL DE CONFIGURACOES -->
             <div id="settings-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Configurações</h2>
@@ -133,6 +136,9 @@
                 </div>
             </div>
 
+
+            
+            <!-- MODAL DE EDICAO DE DISCIPLINA -->
             <div id="edit-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Editar Disciplina</h2>
@@ -149,9 +155,10 @@
                 </div>
             </div>
 
+            <!-- MODAL DE ADICIONAR NOTA -->
             <div id="modal-nova-nota" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
-                    <h2>Lançar Nota</h2>
+                    <h2 id="titulo-modal-nota">Lançar Nota</h2>
                     <div class="nota-inputs">
                         <input type="text" id="input-nota-nome" placeholder="Ex.: Prova 1" required>
                         <input type="number" id="input-nota-valor" placeholder="Nota" required>
@@ -162,16 +169,24 @@
                 </div>
             </div>
 
+            <!-- BOTAO FLUTUANTE -->
             <div id="fab-overlay" style="display: none;"></div>
 
             <div id="fab-container">
                 <div id="fab-menu" style="display: none;">
-                    <button id="btn-fab-disciplina">📚 Nova Disciplina</button>
-                    <button id="btn-fab-evento">📅 Novo Evento</button>
+                    <button id="btn-fab-disciplina">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+                        Nova Disciplina
+                    </button>
+                    <button id="btn-fab-evento">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        Novo Evento
+                    </button>
                 </div>
                 <button id="fab-main">+</button>
             </div>
 
+            <!-- MODAL DE ADICIONAR DISCIPLINA -->
             <div id="create-disciplina-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Nova Disciplina</h2>
@@ -186,10 +201,25 @@
                 </div>
             </div>
 
+            <!-- MODAL HISTORICO DE NOTAS -->
+            <div id="modal-historico" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h2>Histórico de Notas</h2>
+
+                    <div id="lista-historico" class="lista-historico">
+
+                    </div>
+
+                    <button id="btn-close-historico" class="btn-secondary">Fechar</button>
+                </div>
+            </div>
+
         </section>
 
     </main>
-
-    <script src="./app.js"></script>
+    <script src="app.js"></script>",
 </body>
 </html>
+
+    
+        

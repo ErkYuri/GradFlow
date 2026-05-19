@@ -1,5 +1,5 @@
 // ---------------------------------------------------------
-// VARIÁVEIS GERAIS
+// ------------------ VARIÁVEIS GERAIS --------------------
 // ---------------------------------------------------------
 
 // Telas principais
@@ -34,8 +34,8 @@ const btnSaveChanges = document.getElementById('btn-save-changes');
 
 // Pesquisa e Listagem
 const inputPesquisa = document.getElementById('input-pesquisa');
-const ListaDisciplinas = document.getElementById('lista-disciplinas');
-const ListaNotas = document.getElementById('lista-notas');
+const listaDisciplinas = document.getElementById('lista-disciplinas');
+const listaNotas = document.getElementById('lista-notas');
 
 // Botão Flutuante e Modal de Criação
 const fabMain = document.getElementById('fab-main');
@@ -69,6 +69,18 @@ const inputNotaValor = document.getElementById('input-nota-valor');
 const btnSaveNota = document.getElementById('btn-save-nota');
 const btnCancelNota = document.getElementById('btn-cancel-nota');
 
+// Modal de Historico
+let indiceNotaParaEdicao = null;
+const modalHistorico = document.getElementById('modal-historico');
+const listaHistorico = document.getElementById('lista-historico');
+const btnCloseHistorico = document.getElementById('btn-close-historico');
+const tituloModalNota = document.getElementById('titulo-modal-nota');
+
+// --- ÍCONES VETORIAIS (SVG) PADRONIZADOS ---
+const SVGLapis = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+const SVGLixeira = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8d0404" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
+const SVGBook = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>`;
+const SVGCalendar = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
 
 // ---------------------------------------------------------
 // NAVEGAÇÃO DE TELAS
@@ -266,7 +278,7 @@ function atualizarDisciplinas(termoPesquisa = ''){
     if(!usuarioLogado) return;
 
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-    ListaDisciplinas.innerHTML = '';
+    listaDisciplinas.innerHTML = '';
 
     const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
         const nomeMateria = disciplina.nome.toLowerCase();
@@ -275,7 +287,7 @@ function atualizarDisciplinas(termoPesquisa = ''){
     });
 
     if(disciplinasFiltradas.length === 0){
-        ListaDisciplinas.innerHTML = `
+        listaDisciplinas.innerHTML = `
             <div style="text-align: center; margin-top: 40px; color: #777;">
                 <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
                 <p>Nenhuma disciplina encontrada.<br>Adicione no botão + abaixo!</p>
@@ -294,9 +306,15 @@ function atualizarDisciplinas(termoPesquisa = ''){
             }
 
             const cardHTML = `
-                <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                    <h3 style="margin-top: 0; color: var(--brand-color);">${disciplina.nome}</h3>
-                    <p style="margin: 8px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
+                <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+                    
+                    <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 12px;">
+                        <button onclick="abrirModalEditar(${index})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Editar Disciplina">${SVGLapis}</button>
+                        <button onclick="excluirDisciplina(${index})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Excluir Disciplina">${SVGLixeira}</button>
+                    </div>
+
+                    <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 60px; text-transform: uppercase; font-size: 18px;">${disciplina.nome}</h3>
+                    <p style="margin: 8px 0 12px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
                     
                     <div style="width: 100%; background: #eee; border-radius: 10px; height: 10px; margin-bottom: 8px; overflow: hidden;">
                         <div style="height: 100%; background: ${corBarra}; width: ${porcentagemFaltas}%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
@@ -304,19 +322,16 @@ function atualizarDisciplinas(termoPesquisa = ''){
 
                     ${avisoHTML}
 
-                    <div style="display: flex; gap: 8px; margin-top: 12px;">
-                        <button onclick="adicionarFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Falta</button>
-                        <button onclick="removerFalta(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">- Falta</button>
-                        <button onclick="abrirModalEditar(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #e6a700; color: #222; font-weight: bold; cursor: pointer;">Editar</button>
-                        <button onclick="excluirDisciplina(${index})" style="flex: 1; padding: 8px; border: none; border-radius: 6px; background: #480000; color: #fff; font-weight: bold; cursor: pointer;">Excluir</button>
+                    <div style="display: flex; gap: 8px; margin-top: 16px;">
+                        <button onclick="adicionarFalta(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Falta</button>
+                        <button onclick="removerFalta(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">- Falta</button>
                     </div>
                 </div>
             `;
-            ListaDisciplinas.innerHTML += cardHTML;
+            listaDisciplinas.innerHTML += cardHTML;
         });
     }
 }
-
 
 
 
@@ -414,6 +429,26 @@ function abrirModalEditar(index) {
     editModal.style.display = 'flex';
 }
 
+// FUNCAO EDITAR NOTA
+function abrirModalEditarNota(indexMateria, indexNota){
+    indiceMateriaParaNota = indexMateria;
+    indiceNotaParaEdicao = indexNota;
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const materia = dadosSalvos.disciplinas[indexMateria];
+    const notaAntiga = materia.atividades[indexNota];
+
+    inputNotaNome.value = notaAntiga.nome;
+    inputNotaValor.value = notaAntiga.nota;
+
+    modalHistorico.style.display = 'none';
+    tituloModalNota.innerText = 'Editar Nota';
+    modalNovaNota.style.display = 'flex';
+    
+}
+
+
 btnSaveEdit.addEventListener('click', function(){
     const newNomeDisciplina = inputEditName.value.trim();
     const newProfessor = inputEditProfessor.value.trim();
@@ -438,6 +473,9 @@ btnSaveEdit.addEventListener('click', function(){
 
     editModal.style.display = 'none';
     indiceEdicao = null;
+
+    atualizarDisciplinas();
+    atualizarNotas();
 });
 
 btnCancelEdit.addEventListener('click', function(){
@@ -452,7 +490,7 @@ function abrirModalNovaNota(index) {
 
     inputNotaNome.value = '';
     inputNotaValor.value = '';
-
+    tituloModalNota.innerText = 'Lançar Nota';
     modalNovaNota.style.display='flex';
     
 }
@@ -475,11 +513,18 @@ btnSaveNota.addEventListener('click', function(){
         nota: parseFloat(novaNotaValor)
     }
 
-    dadosSalvos.disciplinas[indiceMateriaParaNota].atividades.push(novaNota);
+    if (indiceNotaParaEdicao === null) {
+    
+        dadosSalvos.disciplinas[indiceMateriaParaNota].atividades.push(novaNota);
+    } else {
+        dadosSalvos.disciplinas[indiceMateriaParaNota].atividades[indiceNotaParaEdicao] = novaNota;
+    }
+
     localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
 
     modalNovaNota.style.display='none';
     indiceMateriaParaNota = null;
+    indiceNotaParaEdicao = null;
 
     atualizarNotas();
 });
@@ -488,21 +533,85 @@ btnCancelNota.addEventListener('click', function(){
 
     modalNovaNota.style.display='none';
     indiceMateriaParaNota = null;
+    indiceNotaParaEdicao = null;
 });
 
+
+// RENDERIZAR HISTORICO DE NOTAS
 function abrirModalHistorico(index) {
-    alert("Em breve: Modal para ver a lista de notas da matéria " + index);
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const materia = dadosSalvos.disciplinas[index];
+
+    listaHistorico.innerHTML = '';
+
+    if(materia.atividades.length === 0){
+        listaHistorico.innerHTML = `
+            <div style="text-align: center; margin-top: 8px; margin-bottom: 20px; color: #616161;">
+                <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
+                <p>Nenhuma nota lançada ainda.</p>
+            </div>
+        `;
+    } else {
+        materia.atividades.forEach(function(ativ, indiceNota){
+            const notasHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #eee;">
+                    
+                    <div>
+                        <strong style="color: var(--brand-color); text-transform: capitalize;">${ativ.nome}</strong>
+                        <span style="color: #555; margin-left: 8px;">${ativ.nota} pts</span>
+                    </div>
+
+                    <div style="display: flex; gap: 14px; align-items: center;">
+                        <button onclick="abrirModalEditarNota(${index}, ${indiceNota})" style="background: transparent; border: none; cursor: pointer; padding: 2px;" title="Editar Nota">${SVGLapis}</button>
+                        <button onclick="excluirNota(${index}, ${indiceNota})" style="background: transparent; border: none; cursor: pointer; padding: 2px;" title="Excluir Nota">${SVGLixeira}</button>
+                    </div>
+
+                </div>
+            `;
+            listaHistorico.innerHTML += notasHTML;
+        });
+    }
+
+    document.getElementById('modal-historico').style.display = 'flex';
 }
 
 
-// RENDERIZAR TELA DE NOTAS
+// EXCLUIR NOTA DO HISTORICO
+// EXCLUIR NOTA DO HISTORICO
+function excluirNota(indexMateria, indexNota) {
+    const confirmacao = confirm('Excluir nota?');
 
+    if(!confirmacao) {
+        return;
+    }
+
+    const usuarioLogado = localStorage.getItem('loggedUser');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+
+    dadosSalvos.disciplinas[indexMateria].atividades.splice(indexNota, 1);
+
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    atualizarNotas();
+    abrirModalHistorico(indexMateria); 
+}
+
+// FECHAR MODAL DE HISTORICO
+btnCloseHistorico.addEventListener('click', function(){
+
+    modalHistorico.style.display = 'none';
+});
+
+
+// RENDERIZAR TELA DE NOTAS
 function atualizarNotas(termoPesquisa = ''){
     const usuarioLogado = localStorage.getItem('loggedUser');
     if(!usuarioLogado) return;
 
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-    ListaNotas.innerHTML = '';
+    listaNotas.innerHTML = '';
 
     const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
         const nomeMateria = disciplina.nome.toLowerCase();
@@ -511,7 +620,7 @@ function atualizarNotas(termoPesquisa = ''){
     });
 
     if(disciplinasFiltradas.length === 0){
-        ListaNotas.innerHTML = `
+        listaNotas.innerHTML = `
             <div style="text-align: center; margin-top: 40px; color: #777;">
                 <p style="font-size: 40px; margin-bottom: 8px;">📚</p>
                 <p>Nenhuma disciplina encontrada.<br>Adicione no botão + abaixo!</p>
@@ -519,46 +628,41 @@ function atualizarNotas(termoPesquisa = ''){
         `;
     } else {
         disciplinasFiltradas.forEach(function(disciplina, index) {
-            
-            
             let notaTotal = 0;
 
-            // Verifica se existem atividades antes de somar
             if (disciplina.atividades && disciplina.atividades.length > 0) {
                 disciplina.atividades.forEach(function(ativ) {
                     notaTotal += parseFloat(ativ.nota);
                 });
             }
-            statusHTML = '';
 
+            let statusHTML = '';
             if(notaTotal >= 60) {
-                statusHTML = `
-                <span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Aprovado</span>`
+                statusHTML = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">Aprovado</span>`;
             } else  {
-                statusHTML = `
-                <span style="background: #fff5d2; color: #9e7f01; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px;">Pendente</span>`
+                statusHTML = `<span style="background: #fff5d2; color: #9e7f01; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">Pendente</span>`;
             }
 
-            // Trava a barra visual em 100% (caso o aluno tenha ponto extra e tire 102, a barra não vaza da tela)
             let porcentagemNota = notaTotal > 100 ? 100 : notaTotal;
             const corBarraNota = calcularGradienteNota(porcentagemNota);
 
-            // Monta o subtítulo Professor e Sala
             let subtituloHTML = '';
             if (disciplina.professor || disciplina.sala) {
                 let prof = disciplina.professor ? `Prof. ${disciplina.professor}` : '';
                 let sala = disciplina.sala ? `Sala ${disciplina.sala}` : '';
-                let separador = (prof && sala) ? ' - ' : ''; // Só põe o tracinho se tiver os dois
+                let separador = (prof && sala) ? ' - ' : '';
                 subtituloHTML = `<p style="margin: 4px 0 12px 0; color: #777; font-size: 14px; text-transform: capitalize;">${prof}${separador}${sala}</p>`;
             }
 
-        
             const cardHTML = `
                 <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
                     
-                    <button onclick="abrirModalEditar(${index})" style="position: absolute; top: 16px; right: 16px; background: transparent; border: none; cursor: pointer; font-size: 18px;" title="Editar Disciplina">✏️</button>
+                    <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 12px;">
+                        <button onclick="abrirModalEditar(${index})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Editar Disciplina">${SVGLapis}</button>
+                        <button onclick="excluirDisciplina(${index})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Excluir Disciplina">${SVGLixeira}</button>
+                    </div>
 
-                    <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 30px;">${disciplina.nome}</h3>
+                    <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 60px; text-transform: uppercase; font-size: 18px;">${disciplina.nome}</h3>
                     
                     ${subtituloHTML}
 
@@ -574,7 +678,7 @@ function atualizarNotas(termoPesquisa = ''){
                     </div>
                 </div>
             `;
-            ListaNotas.innerHTML += cardHTML;
+            listaNotas.innerHTML += cardHTML;
         });
     }
 }
