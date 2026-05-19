@@ -98,9 +98,16 @@
                     </div>
                 </div>
 
-                <div id="view-eventos" style="display: none;">
-                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Meus Eventos</h2>
-                    <p style="text-align: center; color: #777;">Em construção... 🚧</p>
+                <div id="view-eventos" style="display: none; padding: 16px;">
+                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 20px;">Meus Eventos</h2>
+                    
+                    <div style="display: flex; background: #eee; padding: 4px; border-radius: 8px; margin-bottom: 20px; gap: 4px;">
+                        <button id="filtro-btn-pendentes" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: var(--brand-color); color: white; transition: background 0.2s;">Pendentes</button>
+                        <button id="filtro-btn-concluidos" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: transparent; color: #555; transition: background 0.2s;">Concluídos</button>
+                        <button id="filtro-btn-todos" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: transparent; color: #555; transition: background 0.2s;">Todos</button>
+                    </div>
+                    
+                    <div id="lista-eventos"></div>
                 </div>
 
             </article>
@@ -228,6 +235,44 @@
                 </div>
             </div>
 
+            <!-- ================================================================================ -->
+            <!-- ----------------------- MODAL DE EVENTOS ----------------------- -->
+            <!-- ================================================================================ -->
+
+            <div id="modal-criar-evento" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h2>Novo Evento</h2>
+                    <div class="edit-inputs">
+                        
+                        <input type="text" id="input-evento-titulo" placeholder="Ex: Prova 2, Lista 1...">   
+
+                        <select id="select-evento-tipo">
+                            <option value="prova">Prova</option>
+                            <option value="trabalho">Trabalho</option>
+                            <option value="atividade">Atividade</option>
+                            <option value="outros">Outros</option>
+                        </select>
+
+                        <select id="select-evento-disciplina">
+                            <option value="">Carregando disciplinas...</option>
+                        </select>
+
+                        <input type="date" id="input-evento-data">
+
+                        <div class="form-toggle">
+                            <span style="font-weight: bold; color: #555; font-size: 14px;">Ativar Alerta</span>
+                            <label class="switch">
+                                <input type="checkbox" id="check-evento-lembrete" checked>
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="btn-save-evento" class="btn-primary">Salvar</button>
+                    <button id="btn-cancel-evento" class="btn-secondary">Cancelar</button>
+                    
+                </div>
+            </div>
         </section>
 
     </main>

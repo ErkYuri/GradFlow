@@ -77,6 +77,16 @@ const listaHistorico = document.getElementById('lista-historico');
 const btnCloseHistorico = document.getElementById('btn-close-historico');
 const tituloModalNota = document.getElementById('titulo-modal-nota');
 
+// Modal de Adicionar Evento
+const modalCriarEvento = document.getElementById('modal-criar-evento');
+const btnSaveEvento = document.getElementById('btn-save-evento');
+const btnCancelEvento = document.getElementById('btn-cancel-evento');
+
+// Tela de Eventos
+let idEventoEdicao = null; 
+let filtroEventoAtual = 'pendentes'; 
+const listaEventos = document.getElementById('lista-eventos');
+
 // --- ÍCONES VETORIAIS (SVG) PADRONIZADOS ---
 const SVGLapis = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
 const SVGLixeira = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8d0404" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`;
@@ -85,6 +95,10 @@ const SVGCalendar = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none"
 const SVGExport = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>`
 const SVGImport = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>`
 const SVGLogout = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`
+const SVGCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+const SVGUndo = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`;
+
+
 
 // ---------------------------------------------------------
 // NAVEGAÇÃO DE TELAS
@@ -116,6 +130,7 @@ navEventos.addEventListener('click', function(){
     esconderTodasAsTelas();
     viewEventos.style.display = 'block';
     navEventos.className = 'nav-btn-active';
+    atualizarEventos();
 });
 
 
@@ -182,7 +197,7 @@ formLogin.addEventListener('submit', function(evento){
         return;
     }
 
-    localStorage.setItem('loggedUser', user);
+    localStorage.setItem('usuarioLogado', user);
     authView.style.display = 'none';
     appView.style.display = 'block';
     atualizarDisciplinas();
@@ -227,7 +242,22 @@ btnFabDisciplina.addEventListener('click', function() {
 // Clica em "Novo Evento"
 btnFabEvento.addEventListener('click', function() {
     fecharFabMenu();
-    alert('A criação de eventos será implementada em breve! 🚧');
+    
+    
+    idEventoEdicao = null;
+    
+    
+    const tituloModal = document.querySelector('#modal-criar-evento h2');
+    if (tituloModal) tituloModal.innerText = 'Novo Evento';
+    
+    
+    document.getElementById('input-evento-titulo').value = '';
+    document.getElementById('input-evento-data').value = '';
+    document.getElementById('select-evento-tipo').value = 'prova';
+    document.getElementById('check-evento-lembrete').checked = true;
+
+    carregarDisciplinasNoSelect();
+    modalCriarEvento.style.display = 'flex';
 });
 
 // Cancela a criação da disciplina
@@ -247,7 +277,7 @@ btnSaveNewDisciplina.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
 
     const novaDisciplina = {
@@ -278,7 +308,7 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 // ---------------------------------------------------------
 
 function atualizarDisciplinas(termoPesquisa = ''){
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     if(!usuarioLogado) return;
 
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
@@ -345,7 +375,7 @@ inputPesquisa.addEventListener('input', function(evento){
 });
 
 function adicionarFalta(indexMateria){
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     const materia = dadosSalvos.disciplinas[indexMateria];
 
@@ -359,7 +389,7 @@ function adicionarFalta(indexMateria){
 }
 
 function removerFalta(indexMateria){
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     const materia = dadosSalvos.disciplinas[indexMateria];
 
@@ -374,7 +404,7 @@ function excluirDisciplina(indexMateria){
     const confirmacao = confirm('Excluir disciplina?');
     if(!confirmacao) return;
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
 
     dadosSalvos.disciplinas.splice(indexMateria, 1);
@@ -422,7 +452,7 @@ function calcularGradienteNota(nota) {
 
 function abrirModalEditar(index) {
     indiceEdicao = index;
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     const materia = dadosSalvos.disciplinas[index];
 
@@ -438,7 +468,7 @@ function abrirModalEditarNota(indexMateria, indexNota){
     indiceMateriaParaNota = indexMateria;
     indiceNotaParaEdicao = indexNota;
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     const materia = dadosSalvos.disciplinas[indexMateria];
     const notaAntiga = materia.atividades[indexNota];
@@ -464,7 +494,7 @@ btnSaveEdit.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     
     dadosSalvos.disciplinas[indiceEdicao].nome = newNomeDisciplina;
@@ -509,7 +539,7 @@ btnSaveNota.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
 
     const novaNota = {
@@ -543,7 +573,7 @@ btnCancelNota.addEventListener('click', function(){
 
 // RENDERIZAR HISTORICO DE NOTAS
 function abrirModalHistorico(index) {
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
     const materia = dadosSalvos.disciplinas[index];
 
@@ -582,7 +612,6 @@ function abrirModalHistorico(index) {
 
 
 // EXCLUIR NOTA DO HISTORICO
-// EXCLUIR NOTA DO HISTORICO
 function excluirNota(indexMateria, indexNota) {
     const confirmacao = confirm('Excluir nota?');
 
@@ -590,7 +619,7 @@ function excluirNota(indexMateria, indexNota) {
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
 
 
@@ -611,7 +640,7 @@ btnCloseHistorico.addEventListener('click', function(){
 
 // RENDERIZAR TELA DE NOTAS
 function atualizarNotas(termoPesquisa = ''){
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     if(!usuarioLogado) return;
 
     const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
@@ -678,7 +707,7 @@ function atualizarNotas(termoPesquisa = ''){
 
                     <div style="display: flex; gap: 8px;">
                         <button onclick="abrirModalNovaNota(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: var(--brand-color); color: #fff; font-weight: bold; cursor: pointer;">+ Nota</button>
-                        <button onclick="abrirModalHistorico(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: #eee; font-weight: bold; color: #333; cursor: pointer;">Histórico</button>
+                        <button onclick="abrirModalHistorico(${index})" style="flex: 1; padding: 10px; border: none; border-radius: 6px; background: #ccc; font-weight: bold; color: #333; cursor: pointer;">Histórico</button>
                     </div>
                 </div>
             `;
@@ -687,7 +716,355 @@ function atualizarNotas(termoPesquisa = ''){
     }
 }
 
+// ---------------------------------------------------------
+// TELA DE EVENTOS
+// ---------------------------------------------------------
 
+function carregarDisciplinasNoSelect(){
+    
+    const selectDisciplina = document.getElementById('select-evento-disciplina');
+
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    if(!usuarioLogado) return;
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    selectDisciplina.innerHTML = '<option value="">- Selecione a disciplina -</option>';
+
+    // Se o usuário tiver disciplinas, faz um loop injetando cada uma delas
+    if (dadosSalvos.disciplinas && dadosSalvos.disciplinas.length > 0) {
+        dadosSalvos.disciplinas.forEach(function(disciplina, index) {
+            // Guardamos o INDEX da disciplina no "value" para sabermos a qual matéria o evento pertence!
+            selectDisciplina.innerHTML += `<option value="${index}">${disciplina.nome}</option>`;
+        });
+    }
+
+}
+
+btnSaveEvento.addEventListener('click', function() {
+    
+    const titulo = document.getElementById('input-evento-titulo').value.trim();
+    const disciplinaValor = document.getElementById('select-evento-disciplina').value; 
+    const data = document.getElementById('input-evento-data').value;
+    const tipo = document.getElementById('select-evento-tipo').value;
+    const lembreteAtivo = document.getElementById('check-evento-lembrete').checked; 
+
+    
+    if (titulo === '' || data === '') {
+        alert('Por favor, preencha o título e a data do evento.');
+        return;
+    }
+
+    
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    
+    if (!dadosSalvos.eventos) {
+        dadosSalvos.eventos = [];
+    }
+
+    
+    if (idEventoEdicao === null) {
+        
+        const novoEvento = {
+            id: Date.now(),
+            titulo: titulo,
+            disciplinaIndex: disciplinaValor === "" ? null : parseInt(disciplinaValor), 
+            data: data,
+            tipo: tipo,
+            lembreteAtivo: lembreteAtivo,
+            concluido: false 
+        };
+        dadosSalvos.eventos.push(novoEvento);
+    } else {
+        
+        const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEventoEdicao);
+        
+        if (indexReal !== -1) {
+            dadosSalvos.eventos[indexReal].titulo = titulo;
+            dadosSalvos.eventos[indexReal].disciplinaIndex = disciplinaValor === "" ? null : parseInt(disciplinaValor);
+            dadosSalvos.eventos[indexReal].data = data;
+            dadosSalvos.eventos[indexReal].tipo = tipo;
+            dadosSalvos.eventos[indexReal].lembreteAtivo = lembreteAtivo;
+            
+        }
+    }
+
+    
+    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+
+    
+    idEventoEdicao = null;
+
+    // Limpa os campos de digitação e fecha o modal
+    document.getElementById('input-evento-titulo').value = '';
+    document.getElementById('input-evento-data').value = '';
+    modalCriarEvento.style.display = 'none';
+
+    // Redireciona e atualiza a lista na tela de forma limpa!
+    esconderTodasAsTelas();
+    viewEventos.style.display = 'block';
+    navEventos.className = 'nav-btn-active';
+    atualizarEventos();
+});
+
+
+btnCancelEvento.addEventListener('click', function(){
+
+    modalCriarEvento.style.display = 'none';
+
+    document.getElementById('input-evento-titulo').value = '';
+    document.getElementById('input-evento-data').value = '';
+    document.getElementById('select-evento-tipo').value = 'prova'; 
+    document.getElementById('check-evento-lembrete').checked = true;
+})
+
+function atualizarEventos() {
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    if (!usuarioLogado) return;
+
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    
+   
+    listaEventos.innerHTML = '';
+
+    // Se não houver eventos, mostra a tela vazia
+    if (!dadosSalvos.eventos || dadosSalvos.eventos.length === 0) {
+        listaEventos.innerHTML = `
+            <div style="text-align: center; margin-top: 40px; color: #777; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#777777" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${SVGCalendar.replace(/<svg[^>]*>|<\/svg>/g, '')}</svg>
+                <p>Nenhum evento agendado.<br>Clique no botão + para criar!</p>
+            </div>
+        `;
+        return; 
+    }
+
+    dadosSalvos.eventos.sort(function(a, b) {
+        return new Date(a.data) - new Date(b.data);
+    });
+
+    const eventosFiltrados = dadosSalvos.eventos.filter(function(evento) {
+        if (filtroEventoAtual === 'pendentes') {
+            return !evento.concluido; // Só deixa passar se concluído for FALSE
+        } else if (filtroEventoAtual === 'concluidos') {
+            return evento.concluido; // Só deixa passar se concluído for TRUE
+        } else {
+            return true; // Se o filtro for 'todos', deixa passar todo mundo
+        }
+    });
+
+    // Se o array filtrado ficar vazio
+    if (eventosFiltrados.length === 0) {
+        listaEventos.innerHTML = `
+            <div style="text-align: center; margin-top: 40px; color: #777;">
+                <p style="font-size: 32px; margin-bottom: 8px;">🎯</p>
+                <p>Nenhum evento encontrado nesta categoria.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    eventosFiltrados.forEach(function(evento, index) {
+
+        // --- CÁLCULO DOS DIAS RESTANTES ---
+        const dataEvento = new Date(evento.data + 'T00:00:00'); // Força o fuso horário local correto
+        const dataHoje = new Date();
+        dataHoje.setHours(0, 0, 0, 0); // Zera as horas de hoje para o cálculo considerar apenas os dias puros
+
+        // Calcula a diferença em milissegundos e converte para dias
+        const diferencaTempo = dataEvento.getTime() - dataHoje.getTime();
+        const diferencaDias = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
+
+        
+        
+        let etiquetaHTML = '';
+        
+        if (evento.concluido) {
+            // Se já foi feito -> Etiqueta Verde de Sucesso!
+            etiquetaHTML = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Concluído</span>`;
+        } else if (diferencaDias < 0) {
+            // Passou do prazo -> Etiqueta Escura
+            etiquetaHTML = `<span style="background: #f5f5f5; color: #333333; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Atrasado</span>`;
+        } else if (diferencaDias === 0) {
+            // É HOJE! -> Etiqueta Vermelha
+            etiquetaHTML = `<span style="background: #fff0f0; color: #cc0000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">É Hoje!</span>`;
+        } else if (diferencaDias === 1) {
+            // É AMANHÃ! -> Etiqueta Vermelha
+            etiquetaHTML = `<span style="background: #fff0f0; color: #cc0000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Amanhã</span>`;
+        } else if (diferencaDias < 7) {
+            // Menos de 7 dias -> Etiqueta Amarela
+            etiquetaHTML = `<span style="background: #fff9e6; color: #b28000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Faltam ${diferencaDias} dias</span>`;
+        }
+        
+        // Descobre o nome da disciplina vinculada (se houver)
+        let nomeDisciplina = "Geral / Nenhuma";
+        if (evento.disciplinaIndex !== null && dadosSalvos.disciplinas[evento.disciplinaIndex]) {
+            nomeDisciplina = dadosSalvos.disciplinas[evento.disciplinaIndex].nome;
+        }
+
+        
+        const cardHTML = `
+            <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
+                
+                <div style="position: absolute; top: 16px; right: 16px; display: flex; gap: 12px; align-items: center;">
+                    
+                    ${evento.concluido ? 
+                        `<button onclick="desfazerConclusaoEvento(${evento.id})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Desfazer Conclusão">${SVGUndo}</button>` 
+                        : 
+                        `<button onclick="concluirEvento(${evento.id})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Marcar como Concluído">${SVGCheck}</button>`
+                    }
+                    
+                    <button onclick="abrirModalEditarEvento(${evento.id})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Editar Evento">${SVGLapis}</button>
+                    <button onclick="excluirEvento(${evento.id})" style="background: transparent; border: none; cursor: pointer; padding: 4px;" title="Excluir Evento">${SVGLixeira}</button>
+                </div>
+
+                <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 60px; text-transform: uppercase; font-size: 16px;">
+                    ${evento.titulo}
+                </h3>
+                
+                <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 6px;">
+                    <p style="margin: 0; color: #555; font-size: 14px;"><strong>Matéria:</strong> <span style="text-transform: uppercase;">${nomeDisciplina}</span></p>
+                    <p style="margin: 0; color: #555; font-size: 14px;"><strong>Tipo:</strong> <span style="text-transform: capitalize;">${evento.tipo}</span></p>
+                    <p style="margin: 0; color: #555; font-size: 14px;"><strong>Data:</strong> ${evento.data}</p>
+                </div>
+
+                <div style="position: absolute; bottom: 25px; right: 25px;">
+                    ${etiquetaHTML}
+                </div>
+                
+            </div>
+        `;
+
+        
+        listaEventos.innerHTML += cardHTML;
+    });
+}
+
+function alterarFiltroEventos(novoFiltro) {
+    
+    filtroEventoAtual = novoFiltro;
+
+    
+    const btnPendentes = document.getElementById('filtro-btn-pendentes');
+    const btnConcluidos = document.getElementById('filtro-btn-concluidos');
+    const btnTodos = document.getElementById('filtro-btn-todos');
+
+    
+    [btnPendentes, btnConcluidos, btnTodos].forEach(btn => {
+        btn.style.background = 'transparent';
+        btn.style.color = '#555';
+    });
+
+    // Aplica o visual "Ativo" apenas no botão correto
+    if (novoFiltro === 'pendentes') {
+        btnPendentes.style.background = 'var(--brand-color)';
+        btnPendentes.style.color = 'white';
+    } else if (novoFiltro === 'concluidos') {
+        btnConcluidos.style.background = 'var(--brand-color)';
+        btnConcluidos.style.color = 'white';
+    } else if (novoFiltro === 'todos') {
+        btnTodos.style.background = 'var(--brand-color)';
+        btnTodos.style.color = 'white';
+    }
+
+    
+    atualizarEventos();
+}
+
+document.getElementById('filtro-btn-pendentes').addEventListener('click', function() {
+    alterarFiltroEventos('pendentes');
+});
+
+document.getElementById('filtro-btn-concluidos').addEventListener('click', function() {
+    alterarFiltroEventos('concluidos');
+});
+
+document.getElementById('filtro-btn-todos').addEventListener('click', function() {
+    alterarFiltroEventos('todos');
+});
+
+// CONCLUIR EVENTO
+function concluirEvento(idEvento) {
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    
+    const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
+
+    
+    if (indexReal !== -1) {
+        dadosSalvos.eventos[indexReal].concluido = true;
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        atualizarEventos();
+    }
+}
+
+// DESFAZER CONCLUIR EVENTO
+function desfazerConclusaoEvento(idEvento) {
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    
+    const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
+
+    
+    if (indexReal !== -1) {
+        dadosSalvos.eventos[indexReal].concluido = false;
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        atualizarEventos();
+    }
+}
+
+function abrirModalEditarEvento(idEvento) {
+    
+    idEventoEdicao = idEvento;
+
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    
+    const evento = dadosSalvos.eventos.find(ev => ev.id === idEvento);
+    if (!evento) return;
+
+    
+    carregarDisciplinasNoSelect();
+
+    
+    document.getElementById('input-evento-titulo').value = evento.titulo;
+    document.getElementById('select-evento-tipo').value = evento.tipo;
+    document.getElementById('select-evento-disciplina').value = evento.disciplinaIndex === null ? "" : evento.disciplinaIndex;
+    document.getElementById('input-evento-data').value = evento.data;
+    document.getElementById('check-evento-lembrete').checked = evento.lembreteAtivo;
+
+    
+    const tituloModal = document.querySelector('#modal-criar-evento h2');
+    if (tituloModal) tituloModal.innerText = 'Editar Evento';
+
+    
+    modalCriarEvento.style.display = 'flex';
+}
+
+function excluirEvento(idEvento) {
+    const confirmacao = confirm('Deseja realmente excluir este evento?');
+    if (!confirmacao) return;
+
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+
+    
+    const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
+
+    if (indexReal !== -1) {
+        
+        dadosSalvos.eventos.splice(indexReal, 1);
+        
+        
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        
+        
+        atualizarEventos();
+    }
+}
 
 // ---------------------------------------------------------
 // CONFIGURAÇÕES, BACKUP E LOGOUT
@@ -704,7 +1081,7 @@ btnCloseSettings.addEventListener('click', function(){
 btnLogout.addEventListener('click', function(){
     const confirmacao = confirm('Deseja mesmo sair da sua conta?');
     if (confirmacao) {
-        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('usuarioLogado');
         appView.style.display = 'none';
         authView.style.display = 'flex';
         modalSettings.style.display = 'none';
@@ -714,14 +1091,14 @@ btnLogout.addEventListener('click', function(){
 btnQuickLogout.addEventListener('click', function() {
     const confirmacao = confirm('Deseja mesmo sair da sua conta?');
     if (confirmacao) {
-        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('usuarioLogado');
         appView.style.display = 'none';
         authView.style.display = 'flex';
     }
 });
 
 btnExportar.addEventListener('click', function() {
-    const usuarioLogado = localStorage.getItem('loggedUser');
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
     const dadosSalvos = localStorage.getItem(usuarioLogado); 
     const blob = new Blob([dadosSalvos], { type: 'application/json' });
     const linkInvisivel = document.createElement('a');
@@ -756,7 +1133,7 @@ inputImportar.addEventListener('change', function(evento) {
                 }
             });
 
-            const usuarioLogado = localStorage.getItem('loggedUser');
+            const usuarioLogado = localStorage.getItem('usuarioLogado');
             localStorage.setItem(usuarioLogado, JSON.stringify(dadosImportados));
             
             atualizarDisciplinas();
@@ -772,7 +1149,7 @@ inputImportar.addEventListener('change', function(evento) {
 btnSaveChanges.addEventListener('click', function() {
     const newUser = inputNewUser.value.trim();
     const newPass = inputNewPass.value.trim();
-    let currentUser = localStorage.getItem('loggedUser');
+    let currentUser = localStorage.getItem('usuarioLogado');
     
     if (newUser === '' && newPass === '') {
         alert('Preencha pelo menos um dos campos para salvar.');
@@ -794,7 +1171,7 @@ btnSaveChanges.addEventListener('click', function() {
         const dadosSalvos = localStorage.getItem(currentUser);
         localStorage.setItem(newUser, dadosSalvos); 
         localStorage.removeItem(currentUser); 
-        localStorage.setItem('loggedUser', newUser); 
+        localStorage.setItem('usuarioLogado', newUser); 
         
         currentUser = newUser;
         alterouAlgo = true;
