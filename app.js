@@ -318,7 +318,7 @@ function atualizarDisciplinas(termoPesquisa = ''){
                     </div>
 
                     <h3 style="margin-top: 0; color: var(--brand-color); padding-right: 60px; text-transform: uppercase; font-size: 18px;">${disciplina.nome}</h3>
-                    <p style="margin: 8px 0 12px 0; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
+                    <p style="margin: 8px 0 12px 0; font-weight: bold; color: #555;">Faltas: ${disciplina.faltas} / ${disciplina.limite}</p>
                     
                     <div style="width: 100%; background: #eee; border-radius: 10px; height: 10px; margin-bottom: 8px; overflow: hidden;">
                         <div style="height: 100%; background: ${corBarra}; width: ${porcentagemFaltas}%; transition: width 0.3s ease, background-color 0.3s ease;"></div>
@@ -670,7 +670,7 @@ function atualizarNotas(termoPesquisa = ''){
                     
                     ${subtituloHTML}
 
-                    <p style="margin: 8px 0; color: #555; font-weight: bold; font-size: 18px;">Nota Total: ${notaTotal} <span style="font-size: 14px; font-weight: normal; color: #888;">/ 100</span> ${statusHTML}</p>
+                    <p style="margin: 8px 0; color: #555; font-weight: bold; font-size: 16px;">Nota Total: ${notaTotal} <span style="font-size: 14px; font-weight: normal; color: #888;">/ 100</span> ${statusHTML}</p>
 
                     <div style="width: 100%; background: #eee; border-radius: 10px; height: 12px; margin-bottom: 16px; overflow: hidden;">
                         <div style="height: 100%; background: ${corBarraNota}; width: ${porcentagemNota}%; transition: width 0.5s ease, background-color 0.5s ease;"></div>
