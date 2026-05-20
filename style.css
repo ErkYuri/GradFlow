@@ -45,10 +45,13 @@ form {
     gap: 16px;
     width: 100%;
     max-width: 400px;
-    background-color: #EEEEEE;
+    /* 1. Mudamos de #e4e1e1 para #dcd9d9 (um cinza ligeiramente mais encorpado e uniforme) */
+    background-color: #e2dfdf; 
     padding: 32px;
     border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(132, 29, 51, 0.1);
+    /* 2. Sombra dupla: uma suave para espalhar e outra mais escura focada na parte de baixo (eixo Y: 12px) */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 
+                0 12px 28px rgba(132, 29, 51, 0.15);
 }
 
 input {
