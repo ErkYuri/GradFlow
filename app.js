@@ -1203,7 +1203,42 @@ btnSaveChanges.addEventListener('click', function() {
     }
 });
 
-renderizarSaudacao();
+// --- TRAVA DE SESSÃO AUTOMÁTICA ---
+function checarSessaoAtiva() {
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    
+    if (usuarioLogado) {
+        
+        if (typeof esconderTodasAsTelas === 'function') esconderTodasAsTelas();
+        
+        
+        const appView = document.getElementById('app-view');
+        const authView = document.getElementById('main-container'); 
+        const viewDisciplinas = document.getElementById('view-disciplinas'); 
+        const navDisciplinas = document.getElementById('nav-disciplinas');
+
+        if (authView) authView.style.display = 'none';
+        if (appView) appView.style.display = 'block';
+        
+        // Abre na tela de Disciplinas/Faltas por padrão ao recarregar
+        if (viewDisciplinas) viewDisciplinas.style.display = 'block';
+        if (navDisciplinas) navDisciplinas.className = 'nav-btn-active';
+        
+        // Atualiza os dados dinâmicos da tela
+        renderizarSaudacao();
+        if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
+        if (typeof atualizarEventos === 'function') atualizarEventos();
+    } else {
+        // Se não tem ninguém logado, garante que a tela de login apareça
+        const appView = document.getElementById('app-view');
+        const authView = document.getElementById('main-container');
+        if (appView) appView.style.display = 'none';
+        if (authView) authView.style.display = 'flex';
+    }
+}
+
+// Executa a checagem assim que o script terminar de carregar
+checarSessaoAtiva();
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js')
