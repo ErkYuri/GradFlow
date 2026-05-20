@@ -3,6 +3,7 @@
 // ---------------------------------------------------------
 
 // Telas principais
+const viewDashboards = document.getElementById('view-dashboard');
 const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
 const viewFaltas = document.getElementById('view-faltas');
@@ -10,6 +11,7 @@ const viewNotas = document.getElementById('view-notas');
 const viewEventos = document.getElementById('view-eventos');
 
 // Navegação Inferior
+const navDashboard = document.getElementById('nav-dashboard');
 const navFaltas = document.getElementById('nav-faltas');
 const navNotas = document.getElementById('nav-notas');
 const navEventos = document.getElementById('nav-eventos');
@@ -105,13 +107,35 @@ const SVGUndo = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" str
 // ---------------------------------------------------------
 
 function esconderTodasAsTelas() {
-    viewFaltas.style.display = 'none';
-    viewNotas.style.display = 'none';
-    viewEventos.style.display = 'none';
-    navFaltas.className = 'nav-btn';
-    navNotas.className = 'nav-btn';
-    navEventos.className = 'nav-btn';
+    // Esconde todas as divs de conteúdo
+    const viewDashboard = document.getElementById('view-dashboard');
+    const viewFaltas = document.getElementById('view-faltas');
+    const viewNotas = document.getElementById('view-notas');
+    const viewEventos = document.getElementById('view-eventos');
+    
+    if (viewDashboard) viewDashboard.style.display = 'none';
+    if (viewFaltas) viewFaltas.style.display = 'none';
+    if (viewNotas) viewNotas.style.display = 'none';
+    if (viewEventos) viewEventos.style.display = 'none';
+
+    // Reseta todos os botões da barra para a classe inativa (cinza)
+    const navDashboard = document.getElementById('nav-dashboard');
+    const navFaltas = document.getElementById('nav-faltas');
+    const navNotas = document.getElementById('nav-notas');
+    const navEventos = document.getElementById('nav-eventos');
+    
+    if (navDashboard) navDashboard.className = 'nav-btn';
+    if (navFaltas) navFaltas.className = 'nav-btn';
+    if (navNotas) navNotas.className = 'nav-btn';
+    if (navEventos) navEventos.className = 'nav-btn';
 }
+
+navDashboard.addEventListener('click', function(){
+    esconderTodasAsTelas();
+    document.getElementById('view-dashboard').style.display = 'block';
+    this.className = 'nav-btn-active';
+    atualizarDashboard(); // Reconstrói os gráficos e alertas
+});
 
 navFaltas.addEventListener('click', function(){
     esconderTodasAsTelas();
@@ -198,10 +222,22 @@ formLogin.addEventListener('submit', function(evento){
     }
 
     localStorage.setItem('usuarioLogado', user);
+    
+    // Esconde o Login e mostra o App
     authView.style.display = 'none';
     appView.style.display = 'block';
+    
+    
+    
+    esconderTodasAsTelas();
+    document.getElementById('view-dashboard').style.display = 'block';
+    document.getElementById('nav-dashboard').className = 'nav-btn-active';
+    
+    
     renderizarSaudacao();
-    atualizarDisciplinas();
+    atualizarDashboard(); 
+    if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
+    if (typeof atualizarEventos === 'function') atualizarEventos();
 });
 
 function renderizarSaudacao() {
@@ -317,6 +353,118 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 // ---------------------------------------------------------
 // RENDERIZAÇÃO E FILTRO 
 // ---------------------------------------------------------
+
+
+function atualizarDashboard() {
+    const container = document.getElementById('container-dashboard');
+    if (!container) return;
+
+    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    if (!usuarioLogado) return;
+    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado)) || {};
+
+    // ---CÁLCULO DO COEFICIENTE DE RENDIMENTO ---
+    let somaNotasTotais = 0;
+    let totalDisciplinas = 0;
+    let crGeral = 0;
+
+    if (dadosSalvos.disciplinas && dadosSalvos.disciplinas.length > 0) {
+        totalDisciplinas = dadosSalvos.disciplinas.length;
+        
+        // Passa por cada disciplina e soma todas as notas
+        dadosSalvos.disciplinas.forEach(disc => {
+            let notaFinalDisciplina = 0;
+            
+            // Usando a rota direta e exata que já funciona na tela de Notas!
+            if (disc.atividades && disc.atividades.length > 0) {
+                disc.atividades.forEach(ativ => {
+                    notaFinalDisciplina += parseFloat(ativ.nota) || 0;
+                });
+            }
+            
+            somaNotasTotais += notaFinalDisciplina;
+        });
+        
+        // Divide o total pelo número de matérias para ter a média
+        crGeral = ((somaNotasTotais / totalDisciplinas) / 10).toFixed(1); 
+    }
+
+    // Trava a porcentagem do gráfico entre 0 e 100
+    const porcentagemGrafico = (parseFloat(crGeral) * 10) > 100 ? 100 : (parseFloat(crGeral) * 10);
+
+    // --- PROCESSAMENTO DE DADOS (FALTAS) ---
+    let piorMateriaFaltas = "Nenhuma disciplina";
+    let statusFaltasTexto = "Você está 100% seguro contra reprovação.";
+    let corAlertaFaltas = "#1e8e3e"; 
+
+    if (dadosSalvos.disciplinas && dadosSalvos.disciplinas.length > 0) {
+        let maiorProporcao = -1;
+        dadosSalvos.disciplinas.forEach(disc => {
+            const limite = parseInt(disc.limite) || 1; 
+            const atuais = parseInt(disc.faltas) || 0;
+            const proporcao = atuais / limite;
+
+            if (proporcao > maiorProporcao) {
+                maiorProporcao = proporcao;
+                piorMateriaFaltas = disc.nome;
+                statusFaltasTexto = `Você tem ${atuais} de ${limite} faltas máximas permitidas.`;
+                
+                if (proporcao >= 0.8) corAlertaFaltas = "#cc0000"; 
+                else if (proporcao >= 0.5) corAlertaFaltas = "#b28000"; 
+            }
+        });
+    }
+
+    // PROCESSAMENTO DE DADOS - EVENTOS
+    let eventosProximosContador = 0;
+    if (dadosSalvos.eventos && dadosSalvos.eventos.length > 0) {
+        const dataHoje = new Date();
+        dataHoje.setHours(0, 0, 0, 0);
+
+        dadosSalvos.eventos.forEach(ev => {
+            if (!ev.concluido) {
+                const dataEv = new Date(ev.data + 'T00:00:00');
+                const difTempo = dataEv.getTime() - dataHoje.getTime();
+                const difDias = Math.ceil(difTempo / (1000 * 60 * 60 * 24));
+                
+                if (difDias >= 0 && difDias <= 7) {
+                    eventosProximosContador++;
+                }
+            }
+        });
+    }
+
+    // MONTAGEM DOS CARDS VISUAIS NO CONTAINER ---
+    container.innerHTML = `
+        <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s;" onclick="document.getElementById('nav-notas').click();">
+            <p style="margin: 0 0 12px 0; font-size: 12px; font-weight: bold; color: #777; text-transform: uppercase;">Desempenho Geral</p>
+            
+            <div class="donut-container">
+                <div class="donut-chart" style="background: conic-gradient(var(--brand-color) ${porcentagemGrafico}%, #e0e0e0 0%);">
+                    <div class="donut-inner">${crGeral}</div>
+                </div>
+                <div>
+                    <h3 style="margin: 0 0 4px 0; color: #333; font-size: 16px;">Coeficiente UFOP</h3>
+                    <p style="margin: 0; font-size: 13px; color: #777;">Sua média atual no semestre.</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 6px solid ${corAlertaFaltas}; cursor: pointer;" onclick="document.getElementById('nav-faltas').click();">
+            <p style="margin: 0; font-size: 12px; font-weight: bold; color: #777; text-transform: uppercase;">Atenção com Faltas</p>
+            <h3 style="margin: 6px 0 2px 0; color: #333; font-size: 18px; text-transform: uppercase;">${piorMateriaFaltas}</h3>
+            <p style="margin: 0; font-size: 14px; color: #555;">${statusFaltasTexto}</p>
+        </div>
+
+        <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 6px solid ${eventosProximosContador > 0 ? '#b28000' : '#1e8e3e'}; cursor: pointer;" onclick="document.getElementById('nav-eventos').click();">
+            <p style="margin: 0; font-size: 12px; font-weight: bold; color: #777; text-transform: uppercase;">Prazos da Semana</p>
+            <h3 style="margin: 6px 0 2px 0; color: #333; font-size: 24px; font-weight: bold;">
+                ${eventosProximosContador} ${eventosProximosContador === 1 ? 'Compromisso' : 'Compromissos'}
+            </h3>
+            <p style="margin: 0; font-size: 14px; color: #555;">Agendados para os próximos 7 dias.</p>
+        </div>
+    `;
+}
 
 function atualizarDisciplinas(termoPesquisa = ''){
     const usuarioLogado = localStorage.getItem('usuarioLogado');
@@ -684,7 +832,7 @@ function atualizarNotas(termoPesquisa = ''){
             if(notaTotal >= 60) {
                 statusHTML = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">Aprovado</span>`;
             } else  {
-                statusHTML = `<span style="background: #fff5d2; color: #9e7f01; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">Pendente</span>`;
+                statusHTML = `<span style="background: #fff5d2; color: #9e7f01; padding: 4px 8px; border-radius: 4px; font-size: 12px; margin-left: 8px; font-weight: bold;">Andamento</span>`;
             }
 
             let porcentagemNota = notaTotal > 100 ? 100 : notaTotal;
@@ -1162,13 +1310,24 @@ btnSaveChanges.addEventListener('click', function() {
     const newPass = inputNewPass.value.trim();
     let currentUser = localStorage.getItem('usuarioLogado');
     
+    
+    const inputCor = document.getElementById('input-cor-tema');
+    const novaCor = inputCor ? inputCor.value : '#841D33';
+
+    
+    
     if (newUser === '' && newPass === '') {
-        alert('Preencha pelo menos um dos campos para salvar.');
-        return;
+        
+        const dadosAtuais = JSON.parse(localStorage.getItem(currentUser)) || {};
+        if (dadosAtuais.temaCor === novaCor) {
+            alert('Preencha pelo menos um dos campos ou altere a cor para salvar.');
+            return;
+        }
     }
 
     let alterouAlgo = false;
 
+    
     if (newUser !== '') {
         if (newUser === currentUser) {
             alert('O novo usuário deve ser diferente do atual!');
@@ -1188,6 +1347,7 @@ btnSaveChanges.addEventListener('click', function() {
         alterouAlgo = true;
     }
 
+    
     if (newPass !== '') {
         const dadosSalvos = JSON.parse(localStorage.getItem(currentUser));
         dadosSalvos.password = newPass; 
@@ -1195,6 +1355,16 @@ btnSaveChanges.addEventListener('click', function() {
         alterouAlgo = true;
     }
 
+    
+    const dadosFinais = JSON.parse(localStorage.getItem(currentUser)) || {};
+    dadosFinais.temaCor = novaCor;
+    localStorage.setItem(currentUser, JSON.stringify(dadosFinais));
+    
+    
+    document.documentElement.style.setProperty('--brand-color', novaCor);
+    alterouAlgo = true;
+
+    
     if (alterouAlgo) {
         inputNewUser.value = '';
         inputNewPass.value = '';
@@ -1209,27 +1379,37 @@ function checarSessaoAtiva() {
     
     if (usuarioLogado) {
         
+        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado)) || {};
+        if (dadosSalvos.temaCor) {
+            document.documentElement.style.setProperty('--brand-color', dadosSalvos.temaCor);
+            const inputCor = document.getElementById('input-cor-tema');
+            if (inputCor) inputCor.value = dadosSalvos.temaCor;
+        }
+
         if (typeof esconderTodasAsTelas === 'function') esconderTodasAsTelas();
-        
         
         const appView = document.getElementById('app-view');
         const authView = document.getElementById('main-container'); 
-        const viewDisciplinas = document.getElementById('view-disciplinas'); 
-        const navDisciplinas = document.getElementById('nav-disciplinas');
+        
+        const viewDashboard = document.getElementById('view-dashboard'); 
+        const navDashboard = document.getElementById('nav-dashboard');
 
         if (authView) authView.style.display = 'none';
         if (appView) appView.style.display = 'block';
         
-        // Abre na tela de Disciplinas/Faltas por padrão ao recarregar
-        if (viewDisciplinas) viewDisciplinas.style.display = 'block';
-        if (navDisciplinas) navDisciplinas.className = 'nav-btn-active';
+        if (viewDashboard) viewDashboard.style.display = 'block';
+        if (navDashboard) navDashboard.className = 'nav-btn-active';
         
-        // Atualiza os dados dinâmicos da tela
+        
         renderizarSaudacao();
+        
+        
+        if (typeof atualizarDashboard === 'function') atualizarDashboard();
+        
+        
         if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
         if (typeof atualizarEventos === 'function') atualizarEventos();
     } else {
-        // Se não tem ninguém logado, garante que a tela de login apareça
         const appView = document.getElementById('app-view');
         const authView = document.getElementById('main-container');
         if (appView) appView.style.display = 'none';

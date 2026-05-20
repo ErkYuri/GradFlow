@@ -81,7 +81,16 @@
 
             <!-- Conteudo dinamico -->
             <article id="content-area">
-                <div id="view-faltas">
+
+                <div id="view-dashboard">
+                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 20px;">Painel Geral</h2>
+                    
+                    <div id="container-dashboard" style="display: flex; flex-direction: column; gap: 16px;">
+
+                    </div>
+                </div>
+                
+                <div id="view-faltas" style="display: none;">
                     <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Faltas</h2>
 
                     <input type="text" id="input-pesquisa" placeholder="Pesquisar disciplina...">
@@ -116,6 +125,7 @@
             <!-- Barra de navegacao -->
             <nav class="bottom-nav">
                 <ul>
+                    <li><button id="nav-dashboard" class="nav-btn-active">Início</button></li>
                     <li><button id="nav-faltas" class="nav-btn-active">Faltas</button></li>
                     <li><button id="nav-notas" class="nav-btn">Notas</button></li>
                     <li><button id="nav-eventos" class="nav-btn">Eventos</button></li>
@@ -151,10 +161,21 @@
                         </div>
                     </div>
 
-                    <button id="btn-save-changes" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 8px;">Salvar Alterações</button>
+                    <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 16px;">
+                        <p style="margin: 0 0 12px 0; font-weight: bold; color: #555; font-size: 14px;">Aparência</p>
+                        
+                        <div style="display: flex; align-items: center; justify-content: space-between;">
+                            <label for="input-cor-tema" style="font-size: 14px; color: #333;">Cor Principal:</label>
+                            <input type="color" id="input-cor-tema" value="#841D33" style="width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; padding: 0; background: transparent;">
+                        </div>
+                    </div>
 
-                    <button id="btn-logout" class="btn-danger">Sair da Conta</button>
-                    <button id="btn-close-settings" class="btn-secondary">Fechar</button>
+                    <button id="btn-save-changes" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 12px;">Salvar Alterações</button>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button id="btn-close-settings" class="btn-secondary" style="flex: 1; margin: 0; padding: 12px;">Fechar</button>
+                        <button id="btn-logout" class="btn-danger" style="flex: 1; margin: 0; padding: 12px;">Sair da Conta</button>
+                    </div>
                 </div>
             </div>
 

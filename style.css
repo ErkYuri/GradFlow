@@ -481,3 +481,36 @@ header h1 {
     outline: none;
     border-color: var(--brand-color);
 }
+
+
+/* --- GRÁFICOS DO DASHBOARD --- */
+.donut-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.donut-chart {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    /* O conic-gradient será alimentado pelo JavaScript na hora de renderizar! */
+    background: #e0e0e0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.donut-inner {
+    width: 54px;
+    height: 54px;
+    background-color: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: var(--brand-color);
+}
