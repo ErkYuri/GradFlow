@@ -45,11 +45,11 @@ form {
     gap: 16px;
     width: 100%;
     max-width: 400px;
-    /* 1. Mudamos de #e4e1e1 para #dcd9d9 (um cinza ligeiramente mais encorpado e uniforme) */
-    background-color: #e2dfdf; 
+
+    background-color: #e2dede; 
     padding: 32px;
     border-radius: 16px;
-    /* 2. Sombra dupla: uma suave para espalhar e outra mais escura focada na parte de baixo (eixo Y: 12px) */
+    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 
                 0 12px 28px rgba(132, 29, 51, 0.15);
 }
@@ -92,8 +92,21 @@ input {
     cursor: pointer; 
 }
 
+.btn-register {
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--brand-color);
+    color: #ffffff;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    padding: 12px; 
+}
+
 .btn-show-register {
     font-size: 16px;
+    font-weight: bold;
     background-color: transparent;
     border: none;
     color: var(--brand-color);
@@ -101,10 +114,11 @@ input {
 }
 
 .btn-cancel-register {
+    color: white;
     font-size: 16px;
-    background-color: transparent;
+    background-color: #333;
     border-radius: 8px;
-    border: 2px solid #841D33;
+    border: 2px solid #333;
     width: 100%;
     padding: 8px;
 }
@@ -150,26 +164,34 @@ header h1 {
     justify-content: space-around;
 }
 
-.nav-btn {
+.nav-btn, .nav-btn-active {
     background: transparent;
     border-style: none;
-    padding: 18px 12px; 
-    color: rgb(73, 71, 71); 
+    padding: 10px 4px; /* Mais ajustado para não ficar gigante */
     width: 100%;
-    font-size: 14px;
-    font-weight: 500;
+    display: flex;
+    flex-direction: column; /* Coloca o ícone EM CIMA do texto */
+    align-items: center;
+    gap: 6px; /* Respiro entre o ícone e a palavra */
     cursor: pointer;
-    transition: color 0.2s, background-color 0.2s;
+    transition: color 0.2s ease;
+}
+
+.nav-btn {
+    color: #999999; 
+    font-size: 11px; 
+    font-weight: 500;
 }
 
 .nav-btn-active {
-    border-style: none;
-    padding: 18px 12px;
-    font-size: 14px;
-    font-weight: bold;
     color: var(--brand-color) !important; 
-    background: transparent;
-    width: 100%;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+
+.nav-btn svg, .nav-btn-active svg {
+    stroke: currentColor; 
 }
 
 

@@ -100,6 +100,36 @@ const SVGLogout = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" s
 const SVGCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 const SVGUndo = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`;
 
+// =========================================================
+// SISTEMA DE ALERTAS E CONFIRMAÇÕES CUSTOMIZADOS
+// =========================================================
+
+function mostrarAlerta(mensagem, titulo = 'Atenção') {
+    document.getElementById('custom-alert-title').innerText = titulo;
+    document.getElementById('custom-alert-message').innerText = mensagem;
+    const modal = document.getElementById('custom-alert-modal');
+    modal.style.display = 'flex';
+    
+    document.getElementById('btn-custom-alert-ok').onclick = function() {
+        modal.style.display = 'none';
+    };
+}
+
+function mostrarConfirmacao(mensagem, callbackSim, titulo = 'Confirmação') {
+    document.getElementById('custom-confirm-title').innerText = titulo;
+    document.getElementById('custom-confirm-message').innerText = mensagem;
+    const modal = document.getElementById('custom-confirm-modal');
+    modal.style.display = 'flex';
+
+    document.getElementById('btn-custom-confirm-cancel').onclick = function() {
+        modal.style.display = 'none';
+    };
+
+    document.getElementById('btn-custom-confirm-yes').onclick = function() {
+        modal.style.display = 'none';
+        if (typeof callbackSim === 'function') callbackSim();
+    };
+}
 
 
 // ---------------------------------------------------------
@@ -228,7 +258,6 @@ formLogin.addEventListener('submit', function(evento){
     appView.style.display = 'block';
     
     
-    
     esconderTodasAsTelas();
     document.getElementById('view-dashboard').style.display = 'block';
     document.getElementById('nav-dashboard').className = 'nav-btn-active';
@@ -245,7 +274,7 @@ function renderizarSaudacao() {
     const greetingElement = document.getElementById('user-greeting');
     
     if (usuarioLogado && greetingElement) {
-        // Altera o texto dinamicamente para o padrão moderno de apps!
+        
         greetingElement.innerText = `Olá, ${usuarioLogado}`;
     }
 }
@@ -255,9 +284,9 @@ function renderizarSaudacao() {
 // BOTÃO FAB E CRIAÇÃO DE DISCIPLINA
 // ---------------------------------------------------------
 
-const fabOverlay = document.getElementById('fab-overlay'); // Seleciona o fundo escuro
+const fabOverlay = document.getElementById('fab-overlay'); 
 
-// Função auxiliar para fechar tudo do FAB de uma vez
+
 function fecharFabMenu() {
     fabMenu.style.display = 'none';
     fabMain.classList.remove('active');
@@ -560,15 +589,13 @@ function removerFalta(indexMateria){
 }
 
 function excluirDisciplina(indexMateria){
-    const confirmacao = confirm('Excluir disciplina?');
-    if(!confirmacao) return;
-
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
-    dadosSalvos.disciplinas.splice(indexMateria, 1);
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-    atualizarDisciplinas();
+    mostrarConfirmacao('Deseja realmente excluir esta disciplina?', function() {
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        dadosSalvos.disciplinas.splice(indexMateria, 1);
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        atualizarDisciplinas();
+    });
 }
 
 function calcularGradiente(perc) {
@@ -772,22 +799,14 @@ function abrirModalHistorico(index) {
 
 // EXCLUIR NOTA DO HISTORICO
 function excluirNota(indexMateria, indexNota) {
-    const confirmacao = confirm('Excluir nota?');
-
-    if(!confirmacao) {
-        return;
-    }
-
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
-
-    dadosSalvos.disciplinas[indexMateria].atividades.splice(indexNota, 1);
-
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
-    atualizarNotas();
-    abrirModalHistorico(indexMateria); 
+    mostrarConfirmacao('Deseja realmente excluir esta nota?', function() {
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        dadosSalvos.disciplinas[indexMateria].atividades.splice(indexNota, 1);
+        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        atualizarNotas();
+        abrirModalHistorico(indexMateria); 
+    });
 }
 
 // FECHAR MODAL DE HISTORICO
@@ -1203,27 +1222,20 @@ function abrirModalEditarEvento(idEvento) {
     modalCriarEvento.style.display = 'flex';
 }
 
+
 function excluirEvento(idEvento) {
-    const confirmacao = confirm('Deseja realmente excluir este evento?');
-    if (!confirmacao) return;
-
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-
-    
-    const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
-
-    if (indexReal !== -1) {
-        
-        dadosSalvos.eventos.splice(indexReal, 1);
-        
-        
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-        
-        
-        atualizarEventos();
-    }
+    mostrarConfirmacao('Deseja realmente excluir este evento?', function() {
+        const usuarioLogado = localStorage.getItem('usuarioLogado');
+        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
+        if (indexReal !== -1) {
+            dadosSalvos.eventos.splice(indexReal, 1);
+            localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+            atualizarEventos();
+        }
+    });
 }
+
 
 // ---------------------------------------------------------
 // CONFIGURAÇÕES, BACKUP E LOGOUT
@@ -1238,22 +1250,20 @@ btnCloseSettings.addEventListener('click', function(){
 });
 
 btnLogout.addEventListener('click', function(){
-    const confirmacao = confirm('Deseja mesmo sair da sua conta?');
-    if (confirmacao) {
+    mostrarConfirmacao('Deseja mesmo sair da sua conta?', function() {
         localStorage.removeItem('usuarioLogado');
         appView.style.display = 'none';
         authView.style.display = 'flex';
         modalSettings.style.display = 'none';
-    }
+    });
 });
 
 btnQuickLogout.addEventListener('click', function() {
-    const confirmacao = confirm('Deseja mesmo sair da sua conta?');
-    if (confirmacao) {
+    mostrarConfirmacao('Deseja mesmo sair da sua conta?', function() {
         localStorage.removeItem('usuarioLogado');
         appView.style.display = 'none';
         authView.style.display = 'flex';
-    }
+    });
 });
 
 btnExportar.addEventListener('click', function() {
