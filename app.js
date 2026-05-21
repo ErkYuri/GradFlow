@@ -1431,8 +1431,8 @@ function checarSessaoAtiva() {
 checarSessaoAtiva();
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log('Service Worker Registrado com Sucesso!'))
+  navigator.serviceWorker.register('./sw.js', { scope: './' })
+    .then((reg) => console.log('Service Worker do MyGrad Registrado no Escopo:', reg.scope))
     .catch(err => console.log('Erro ao registrar Service Worker:', err));
 }
 
