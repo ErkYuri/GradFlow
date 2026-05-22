@@ -1,35 +1,4 @@
-// =========================================================
-// DATABASE HELPERS (O nosso "Banco de Dados" encapsulado)
-// =========================================================
 
-function getUsuarioLogado() {
-    return localStorage.getItem('mygrad_usuarioLogado');
-}
-
-function setUsuarioLogado(username) {
-    localStorage.setItem('mygrad_usuarioLogado', username);
-}
-
-function removerSessao() {
-    localStorage.removeItem('mygrad_usuarioLogado');
-}
-
-function getDadosUsuario(username) {
-    const dados = localStorage.getItem('mygrad_user_' + username);
-    return dados ? JSON.parse(dados) : null;
-}
-
-function setDadosUsuario(username, data) {
-    localStorage.setItem('mygrad_user_' + username, JSON.stringify(data));
-}
-
-function existeUsuario(username) {
-    return localStorage.getItem('mygrad_user_' + username) !== null;
-}
-
-function removerDadosUsuario(username) {
-    localStorage.removeItem('mygrad_user_' + username);
-}
 
 // ---------------------------------------------------------
 // ------------------ VARIÁVEIS GERAIS --------------------
@@ -132,6 +101,42 @@ const SVGImport = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" s
 const SVGLogout = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>`
 const SVGCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 const SVGUndo = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`;
+
+// =========================================================
+// DATABASE HELPERS (O nosso "Banco de Dados" encapsulado)
+// =========================================================
+
+function getUsuarioLogado() {
+    return localStorage.getItem('mygrad_usuarioLogado');
+}
+
+function setUsuarioLogado(username) {
+    localStorage.setItem('mygrad_usuarioLogado', username);
+}
+
+function removerSessao() {
+    localStorage.removeItem('mygrad_usuarioLogado');
+}
+
+function getDadosUsuario(username) {
+    const dados = localStorage.getItem('mygrad_user_' + username);
+    return dados ? JSON.parse(dados) : null;
+}
+
+function setDadosUsuario(username, data) {
+    localStorage.setItem('mygrad_user_' + username, JSON.stringify(data));
+}
+
+function existeUsuario(username) {
+    return localStorage.getItem('mygrad_user_' + username) !== null;
+}
+
+function removerDadosUsuario(username) {
+    localStorage.removeItem('mygrad_user_' + username);
+}
+
+
+
 
 // =========================================================
 // SISTEMA DE ALERTAS E CONFIRMAÇÕES CUSTOMIZADOS
@@ -1317,6 +1322,12 @@ btnSaveChanges.addEventListener('click', function() {
 function checarSessaoAtiva() {
     const usuarioLogado = getUsuarioLogado();
     
+    
+    const appView = document.getElementById('app-view');
+    const authView = document.getElementById('auth-view'); 
+    const viewDashboard = document.getElementById('view-dashboard'); 
+    const navDashboard = document.getElementById('nav-dashboard');
+
     if (usuarioLogado) {
         const dadosSalvos = getDadosUsuario(usuarioLogado) || {};
         if (dadosSalvos.temaCor) {
@@ -1327,12 +1338,7 @@ function checarSessaoAtiva() {
 
         if (typeof esconderTodasAsTelas === 'function') esconderTodasAsTelas();
         
-        const appView = document.getElementById('app-view');
-        const authView = document.getElementById('main-container'); 
-        
-        const viewDashboard = document.getElementById('view-dashboard'); 
-        const navDashboard = document.getElementById('nav-dashboard');
-
+       
         if (authView) authView.style.display = 'none';
         if (appView) appView.style.display = 'block';
         
@@ -1342,12 +1348,10 @@ function checarSessaoAtiva() {
         renderizarSaudacao();
         
         if (typeof atualizarDashboard === 'function') atualizarDashboard();
-        
         if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
         if (typeof atualizarEventos === 'function') atualizarEventos();
     } else {
-        const appView = document.getElementById('app-view');
-        const authView = document.getElementById('main-container');
+        
         if (appView) appView.style.display = 'none';
         if (authView) authView.style.display = 'flex';
     }
