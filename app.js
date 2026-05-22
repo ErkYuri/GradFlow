@@ -1,3 +1,36 @@
+// =========================================================
+// DATABASE HELPERS (O nosso "Banco de Dados" encapsulado)
+// =========================================================
+
+function getUsuarioLogado() {
+    return localStorage.getItem('mygrad_usuarioLogado');
+}
+
+function setUsuarioLogado(username) {
+    localStorage.setItem('mygrad_usuarioLogado', username);
+}
+
+function removerSessao() {
+    localStorage.removeItem('mygrad_usuarioLogado');
+}
+
+function getDadosUsuario(username) {
+    const dados = localStorage.getItem('mygrad_user_' + username);
+    return dados ? JSON.parse(dados) : null;
+}
+
+function setDadosUsuario(username, data) {
+    localStorage.setItem('mygrad_user_' + username, JSON.stringify(data));
+}
+
+function existeUsuario(username) {
+    return localStorage.getItem('mygrad_user_' + username) !== null;
+}
+
+function removerDadosUsuario(username) {
+    localStorage.removeItem('mygrad_user_' + username);
+}
+
 // ---------------------------------------------------------
 // ------------------ VARIÁVEIS GERAIS --------------------
 // ---------------------------------------------------------
@@ -137,7 +170,6 @@ function mostrarConfirmacao(mensagem, callbackSim, titulo = 'Confirmação') {
 // ---------------------------------------------------------
 
 function esconderTodasAsTelas() {
-    // Esconde todas as divs de conteúdo
     const viewDashboard = document.getElementById('view-dashboard');
     const viewFaltas = document.getElementById('view-faltas');
     const viewNotas = document.getElementById('view-notas');
@@ -148,7 +180,6 @@ function esconderTodasAsTelas() {
     if (viewNotas) viewNotas.style.display = 'none';
     if (viewEventos) viewEventos.style.display = 'none';
 
-    // Reseta todos os botões da barra para a classe inativa (cinza)
     const navDashboard = document.getElementById('nav-dashboard');
     const navFaltas = document.getElementById('nav-faltas');
     const navNotas = document.getElementById('nav-notas');
@@ -164,7 +195,7 @@ navDashboard.addEventListener('click', function(){
     esconderTodasAsTelas();
     document.getElementById('view-dashboard').style.display = 'block';
     this.className = 'nav-btn-active';
-    atualizarDashboard(); // Reconstrói os gráficos e alertas
+    atualizarDashboard(); 
 });
 
 navFaltas.addEventListener('click', function(){
@@ -189,7 +220,7 @@ navEventos.addEventListener('click', function(){
 
 
 // ---------------------------------------------------------
-// AUTENTICAÇÃO 
+// AUTENTICAÇÃO E SESSÃO (Usando Helpers)
 // ---------------------------------------------------------
 
 btnShowRegister.addEventListener('click', function(){
@@ -202,7 +233,6 @@ btnCancelRegister.addEventListener('click', function(){
     formLogin.style.display = 'flex';
 });
 
-// FORMULARIO CADASTRO USUARIO
 formRegister.addEventListener('submit', function(evento) {
     evento.preventDefault();
 
@@ -214,54 +244,52 @@ formRegister.addEventListener('submit', function(evento) {
         alert('As senhas não conferem. Favor verificar');
         return;
     }
-    if(localStorage.getItem(newUser) !== null){
+    
+    if(existeUsuario(newUser)){
         alert('Usuário já existente. Tente outro.');
         return;
     }
 
     const dadosUsuario = {
         password: newPass,
-        disciplinas: []
+        disciplinas: [],
+        eventos: []
     };
 
-    localStorage.setItem(newUser, JSON.stringify(dadosUsuario));
-    alert('Usuário cadastrado!');
+    setDadosUsuario(newUser, dadosUsuario);
+    
+    alert('Usuário cadastrado com sucesso!');
     formRegister.reset();
     formRegister.style.display = 'none';
     formLogin.style.display = 'flex';
 });
 
-
-// FORMULARIO LOGIN
 formLogin.addEventListener('submit', function(evento){
     evento.preventDefault(); 
 
     const user = document.getElementById('login-user').value.trim();
     const pass = document.getElementById('login-pass').value;
 
-    if(localStorage.getItem(user) == null){
+    if(!existeUsuario(user)){
         alert('Usuario não encontrado!');
         return;
     }
 
-    const dadosSalvos = JSON.parse(localStorage.getItem(user));
+    const dadosSalvos = getDadosUsuario(user);
 
     if(pass !== dadosSalvos.password){
         alert('Senha incorreta.');
         return;
     }
 
-    localStorage.setItem('usuarioLogado', user);
+    setUsuarioLogado(user);
     
-    // Esconde o Login e mostra o App
     authView.style.display = 'none';
     appView.style.display = 'block';
-    
     
     esconderTodasAsTelas();
     document.getElementById('view-dashboard').style.display = 'block';
     document.getElementById('nav-dashboard').className = 'nav-btn-active';
-    
     
     renderizarSaudacao();
     atualizarDashboard(); 
@@ -270,11 +298,10 @@ formLogin.addEventListener('submit', function(evento){
 });
 
 function renderizarSaudacao() {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     const greetingElement = document.getElementById('user-greeting');
     
     if (usuarioLogado && greetingElement) {
-        
         greetingElement.innerText = `Olá, ${usuarioLogado}`;
     }
 }
@@ -286,46 +313,35 @@ function renderizarSaudacao() {
 
 const fabOverlay = document.getElementById('fab-overlay'); 
 
-
 function fecharFabMenu() {
     fabMenu.style.display = 'none';
     fabMain.classList.remove('active');
-    fabOverlay.style.display = 'none'; // Esconde o fundo escuro
+    fabOverlay.style.display = 'none'; 
 }
 
-// Abre/Fecha o Menu do botão +
 fabMain.addEventListener('click', function() {
     if (fabMenu.style.display === 'none' || fabMenu.style.display === '') {
-        // Abre o menu
         fabMenu.style.display = 'flex';
         fabMain.classList.add('active'); 
-        fabOverlay.style.display = 'block'; // Mostra o fundo escuro
+        fabOverlay.style.display = 'block'; 
     } else {
-        // Fecha o menu
         fecharFabMenu();
     }
 });
 
-// Clica no fundo escuro fora do botão também fecha o menu
 fabOverlay.addEventListener('click', fecharFabMenu);
 
-// Clica em "Nova Disciplina"
 btnFabDisciplina.addEventListener('click', function() {
-    fecharFabMenu(); // Usa a função auxiliar para recolher o botão e o fundo
+    fecharFabMenu(); 
     createDisciplinaModal.style.display = 'flex';
 });
 
-// Clica em "Novo Evento"
 btnFabEvento.addEventListener('click', function() {
     fecharFabMenu();
-    
-    
     idEventoEdicao = null;
-    
     
     const tituloModal = document.querySelector('#modal-criar-evento h2');
     if (tituloModal) tituloModal.innerText = 'Novo Evento';
-    
     
     document.getElementById('input-evento-titulo').value = '';
     document.getElementById('input-evento-data').value = '';
@@ -336,12 +352,10 @@ btnFabEvento.addEventListener('click', function() {
     modalCriarEvento.style.display = 'flex';
 });
 
-// Cancela a criação da disciplina
 btnCancelNewDisciplina.addEventListener('click', function() {
     createDisciplinaModal.style.display = 'none';
 });
 
-// Salva a nova disciplina
 btnSaveNewDisciplina.addEventListener('click', function(){
     const nomeDisciplina = inputCreateNome.value.trim();
     const professor = inputCreateProfessor.value.trim();
@@ -353,8 +367,8 @@ btnSaveNewDisciplina.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
     const novaDisciplina = {
         nome: nomeDisciplina,
@@ -366,7 +380,7 @@ btnSaveNewDisciplina.addEventListener('click', function(){
     };
 
     dadosSalvos.disciplinas.push(novaDisciplina);
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+    setDadosUsuario(usuarioLogado, dadosSalvos);
 
     inputCreateNome.value = '';
     inputCreateProfessor.value = '';
@@ -383,16 +397,14 @@ btnSaveNewDisciplina.addEventListener('click', function(){
 // RENDERIZAÇÃO E FILTRO 
 // ---------------------------------------------------------
 
-
 function atualizarDashboard() {
     const container = document.getElementById('container-dashboard');
     if (!container) return;
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     if (!usuarioLogado) return;
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado)) || {};
+    const dadosSalvos = getDadosUsuario(usuarioLogado) || {};
 
-    // ---CÁLCULO DO COEFICIENTE DE RENDIMENTO ---
     let somaNotasTotais = 0;
     let totalDisciplinas = 0;
     let crGeral = 0;
@@ -400,28 +412,21 @@ function atualizarDashboard() {
     if (dadosSalvos.disciplinas && dadosSalvos.disciplinas.length > 0) {
         totalDisciplinas = dadosSalvos.disciplinas.length;
         
-        // Passa por cada disciplina e soma todas as notas
         dadosSalvos.disciplinas.forEach(disc => {
             let notaFinalDisciplina = 0;
-            
-            // Usando a rota direta e exata que já funciona na tela de Notas!
             if (disc.atividades && disc.atividades.length > 0) {
                 disc.atividades.forEach(ativ => {
                     notaFinalDisciplina += parseFloat(ativ.nota) || 0;
                 });
             }
-            
             somaNotasTotais += notaFinalDisciplina;
         });
         
-        // Divide o total pelo número de matérias para ter a média
         crGeral = ((somaNotasTotais / totalDisciplinas) / 10).toFixed(1); 
     }
 
-    // Trava a porcentagem do gráfico entre 0 e 100
     const porcentagemGrafico = (parseFloat(crGeral) * 10) > 100 ? 100 : (parseFloat(crGeral) * 10);
 
-    // --- PROCESSAMENTO DE DADOS (FALTAS) ---
     let piorMateriaFaltas = "Nenhuma disciplina";
     let statusFaltasTexto = "Você está 100% seguro contra reprovação.";
     let corAlertaFaltas = "#1e8e3e"; 
@@ -444,7 +449,6 @@ function atualizarDashboard() {
         });
     }
 
-    // PROCESSAMENTO DE DADOS - EVENTOS
     let eventosProximosContador = 0;
     if (dadosSalvos.eventos && dadosSalvos.eventos.length > 0) {
         const dataHoje = new Date();
@@ -463,7 +467,6 @@ function atualizarDashboard() {
         });
     }
 
-    // MONTAGEM DOS CARDS VISUAIS NO CONTAINER ---
     container.innerHTML = `
         <div style="background: white; padding: 16px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); cursor: pointer; transition: transform 0.2s;" onclick="document.getElementById('nav-notas').click();">
             <p style="margin: 0 0 12px 0; font-size: 12px; font-weight: bold; color: #777; text-transform: uppercase;">Desempenho Geral</p>
@@ -496,10 +499,10 @@ function atualizarDashboard() {
 }
 
 function atualizarDisciplinas(termoPesquisa = ''){
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     if(!usuarioLogado) return;
 
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     listaDisciplinas.innerHTML = '';
 
     const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
@@ -555,21 +558,19 @@ function atualizarDisciplinas(termoPesquisa = ''){
     }
 }
 
-
-
 inputPesquisa.addEventListener('input', function(evento){
     const textoDigitado = evento.target.value;
     atualizarDisciplinas(textoDigitado);
 });
 
 function adicionarFalta(indexMateria){
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     const materia = dadosSalvos.disciplinas[indexMateria];
 
     if(materia.faltas < materia.limite){
         materia.faltas += 1;
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarDisciplinas();
     } else {
         alert('Limite de faltas atingido!');
@@ -577,23 +578,23 @@ function adicionarFalta(indexMateria){
 }
 
 function removerFalta(indexMateria){
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     const materia = dadosSalvos.disciplinas[indexMateria];
 
     if(materia.faltas > 0){
         materia.faltas -= 1;
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarDisciplinas();
     }
 }
 
 function excluirDisciplina(indexMateria){
     mostrarConfirmacao('Deseja realmente excluir esta disciplina?', function() {
-        const usuarioLogado = localStorage.getItem('usuarioLogado');
-        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        const usuarioLogado = getUsuarioLogado();
+        const dadosSalvos = getDadosUsuario(usuarioLogado);
         dadosSalvos.disciplinas.splice(indexMateria, 1);
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarDisciplinas();
     });
 }
@@ -620,11 +621,11 @@ function calcularGradienteNota(nota) {
     if (nota <= 50) {
         const ratio = nota / 50;
         r = 255;
-        g = Math.round(255 * ratio); // Vai subindo o verde (vira amarelo)
+        g = Math.round(255 * ratio); 
         b = 0;
     } else {
         const ratio = (nota - 50) / 50;
-        r = Math.round(255 - (255 * ratio)); // Vai tirando o vermelho (vira verde)
+        r = Math.round(255 - (255 * ratio)); 
         g = 200; 
         b = 0;
     }
@@ -638,8 +639,8 @@ function calcularGradienteNota(nota) {
 
 function abrirModalEditar(index) {
     indiceEdicao = index;
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     const materia = dadosSalvos.disciplinas[index];
 
     inputEditName.value = materia.nome;
@@ -649,13 +650,12 @@ function abrirModalEditar(index) {
     editModal.style.display = 'flex';
 }
 
-// FUNCAO EDITAR NOTA
 function abrirModalEditarNota(indexMateria, indexNota){
     indiceMateriaParaNota = indexMateria;
     indiceNotaParaEdicao = indexNota;
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     const materia = dadosSalvos.disciplinas[indexMateria];
     const notaAntiga = materia.atividades[indexNota];
 
@@ -665,9 +665,7 @@ function abrirModalEditarNota(indexMateria, indexNota){
     modalHistorico.style.display = 'none';
     tituloModalNota.innerText = 'Editar Nota';
     modalNovaNota.style.display = 'flex';
-    
 }
-
 
 btnSaveEdit.addEventListener('click', function(){
     const newNomeDisciplina = inputEditName.value.trim();
@@ -680,16 +678,15 @@ btnSaveEdit.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     
     dadosSalvos.disciplinas[indiceEdicao].nome = newNomeDisciplina;
     dadosSalvos.disciplinas[indiceEdicao].professor = newProfessor;
     dadosSalvos.disciplinas[indiceEdicao].sala = newSala;
     dadosSalvos.disciplinas[indiceEdicao].limite = parseInt(newLimiteDisciplina);
 
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-    atualizarDisciplinas();
+    setDadosUsuario(usuarioLogado, dadosSalvos);
 
     editModal.style.display = 'none';
     indiceEdicao = null;
@@ -712,11 +709,9 @@ function abrirModalNovaNota(index) {
     inputNotaValor.value = '';
     tituloModalNota.innerText = 'Lançar Nota';
     modalNovaNota.style.display='flex';
-    
 }
 
 btnSaveNota.addEventListener('click', function(){
-
     const novaNotaNome = inputNotaNome.value.trim();
     const novaNotaValor = inputNotaValor.value;
 
@@ -725,8 +720,8 @@ btnSaveNota.addEventListener('click', function(){
         return;
     }
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
     const novaNota = {
         nome: novaNotaNome,
@@ -734,13 +729,12 @@ btnSaveNota.addEventListener('click', function(){
     }
 
     if (indiceNotaParaEdicao === null) {
-    
         dadosSalvos.disciplinas[indiceMateriaParaNota].atividades.push(novaNota);
     } else {
         dadosSalvos.disciplinas[indiceMateriaParaNota].atividades[indiceNotaParaEdicao] = novaNota;
     }
 
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+    setDadosUsuario(usuarioLogado, dadosSalvos);
 
     modalNovaNota.style.display='none';
     indiceMateriaParaNota = null;
@@ -750,7 +744,6 @@ btnSaveNota.addEventListener('click', function(){
 });
 
 btnCancelNota.addEventListener('click', function(){
-
     modalNovaNota.style.display='none';
     indiceMateriaParaNota = null;
     indiceNotaParaEdicao = null;
@@ -759,8 +752,8 @@ btnCancelNota.addEventListener('click', function(){
 
 // RENDERIZAR HISTORICO DE NOTAS
 function abrirModalHistorico(index) {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     const materia = dadosSalvos.disciplinas[index];
 
     listaHistorico.innerHTML = '';
@@ -800,10 +793,10 @@ function abrirModalHistorico(index) {
 // EXCLUIR NOTA DO HISTORICO
 function excluirNota(indexMateria, indexNota) {
     mostrarConfirmacao('Deseja realmente excluir esta nota?', function() {
-        const usuarioLogado = localStorage.getItem('usuarioLogado');
-        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        const usuarioLogado = getUsuarioLogado();
+        const dadosSalvos = getDadosUsuario(usuarioLogado);
         dadosSalvos.disciplinas[indexMateria].atividades.splice(indexNota, 1);
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarNotas();
         abrirModalHistorico(indexMateria); 
     });
@@ -811,17 +804,16 @@ function excluirNota(indexMateria, indexNota) {
 
 // FECHAR MODAL DE HISTORICO
 btnCloseHistorico.addEventListener('click', function(){
-
     modalHistorico.style.display = 'none';
 });
 
 
 // RENDERIZAR TELA DE NOTAS
 function atualizarNotas(termoPesquisa = ''){
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     if(!usuarioLogado) return;
 
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     listaNotas.innerHTML = '';
 
     const disciplinasFiltradas = dadosSalvos.disciplinas.filter(function(disciplina){
@@ -899,51 +891,41 @@ function atualizarNotas(termoPesquisa = ''){
 // ---------------------------------------------------------
 
 function carregarDisciplinasNoSelect(){
-    
     const selectDisciplina = document.getElementById('select-evento-disciplina');
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     if(!usuarioLogado) return;
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
     selectDisciplina.innerHTML = '<option value="">- Selecione a disciplina -</option>';
 
-    // Se o usuário tiver disciplinas, faz um loop injetando cada uma delas
     if (dadosSalvos.disciplinas && dadosSalvos.disciplinas.length > 0) {
         dadosSalvos.disciplinas.forEach(function(disciplina, index) {
-            // Guardamos o INDEX da disciplina no "value" para sabermos a qual matéria o evento pertence!
             selectDisciplina.innerHTML += `<option value="${index}">${disciplina.nome}</option>`;
         });
     }
-
 }
 
 btnSaveEvento.addEventListener('click', function() {
-    
     const titulo = document.getElementById('input-evento-titulo').value.trim();
     const disciplinaValor = document.getElementById('select-evento-disciplina').value; 
     const data = document.getElementById('input-evento-data').value;
     const tipo = document.getElementById('select-evento-tipo').value;
     const lembreteAtivo = document.getElementById('check-evento-lembrete').checked; 
 
-    
     if (titulo === '' || data === '') {
         alert('Por favor, preencha o título e a data do evento.');
         return;
     }
 
-    
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
-    
     if (!dadosSalvos.eventos) {
         dadosSalvos.eventos = [];
     }
 
-    
     if (idEventoEdicao === null) {
-        
         const novoEvento = {
             id: Date.now(),
             titulo: titulo,
@@ -955,7 +937,6 @@ btnSaveEvento.addEventListener('click', function() {
         };
         dadosSalvos.eventos.push(novoEvento);
     } else {
-        
         const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEventoEdicao);
         
         if (indexReal !== -1) {
@@ -964,22 +945,16 @@ btnSaveEvento.addEventListener('click', function() {
             dadosSalvos.eventos[indexReal].data = data;
             dadosSalvos.eventos[indexReal].tipo = tipo;
             dadosSalvos.eventos[indexReal].lembreteAtivo = lembreteAtivo;
-            
         }
     }
 
-    
-    localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
-
-    
+    setDadosUsuario(usuarioLogado, dadosSalvos);
     idEventoEdicao = null;
 
-    // Limpa os campos de digitação e fecha o modal
     document.getElementById('input-evento-titulo').value = '';
     document.getElementById('input-evento-data').value = '';
     modalCriarEvento.style.display = 'none';
 
-    // Redireciona e atualiza a lista na tela de forma limpa!
     esconderTodasAsTelas();
     viewEventos.style.display = 'block';
     navEventos.className = 'nav-btn-active';
@@ -988,25 +963,20 @@ btnSaveEvento.addEventListener('click', function() {
 
 
 btnCancelEvento.addEventListener('click', function(){
-
     modalCriarEvento.style.display = 'none';
-
     document.getElementById('input-evento-titulo').value = '';
     document.getElementById('input-evento-data').value = '';
     document.getElementById('select-evento-tipo').value = 'prova'; 
     document.getElementById('check-evento-lembrete').checked = true;
-})
+});
 
 function atualizarEventos() {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     if (!usuarioLogado) return;
 
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
-    
-   
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
     listaEventos.innerHTML = '';
 
-    // Se não houver eventos, mostra a tela vazia
     if (!dadosSalvos.eventos || dadosSalvos.eventos.length === 0) {
         listaEventos.innerHTML = `
             <div style="text-align: center; margin-top: 40px; color: #777; display: flex; flex-direction: column; align-items: center; gap: 12px;">
@@ -1023,15 +993,14 @@ function atualizarEventos() {
 
     const eventosFiltrados = dadosSalvos.eventos.filter(function(evento) {
         if (filtroEventoAtual === 'pendentes') {
-            return !evento.concluido; // Só deixa passar se concluído for FALSE
+            return !evento.concluido; 
         } else if (filtroEventoAtual === 'concluidos') {
-            return evento.concluido; // Só deixa passar se concluído for TRUE
+            return evento.concluido; 
         } else {
-            return true; // Se o filtro for 'todos', deixa passar todo mundo
+            return true; 
         }
     });
 
-    // Se o array filtrado ficar vazio
     if (eventosFiltrados.length === 0) {
         listaEventos.innerHTML = `
             <div style="text-align: center; margin-top: 40px; color: #777;">
@@ -1043,44 +1012,32 @@ function atualizarEventos() {
     }
     
     eventosFiltrados.forEach(function(evento, index) {
-
-        // --- CÁLCULO DOS DIAS RESTANTES ---
-        const dataEvento = new Date(evento.data + 'T00:00:00'); // Força o fuso horário local correto
+        const dataEvento = new Date(evento.data + 'T00:00:00'); 
         const dataHoje = new Date();
-        dataHoje.setHours(0, 0, 0, 0); // Zera as horas de hoje para o cálculo considerar apenas os dias puros
+        dataHoje.setHours(0, 0, 0, 0); 
 
-        // Calcula a diferença em milissegundos e converte para dias
         const diferencaTempo = dataEvento.getTime() - dataHoje.getTime();
         const diferencaDias = Math.ceil(diferencaTempo / (1000 * 60 * 60 * 24));
 
-        
-        
         let etiquetaHTML = '';
         
         if (evento.concluido) {
-            // Se já foi feito -> Etiqueta Verde de Sucesso!
             etiquetaHTML = `<span style="background: #e6f4ea; color: #1e8e3e; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Concluído</span>`;
         } else if (diferencaDias < 0) {
-            // Passou do prazo -> Etiqueta Escura
             etiquetaHTML = `<span style="background: #f5f5f5; color: #333333; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Atrasado</span>`;
         } else if (diferencaDias === 0) {
-            // É HOJE! -> Etiqueta Vermelha
             etiquetaHTML = `<span style="background: #fff0f0; color: #cc0000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">É Hoje!</span>`;
         } else if (diferencaDias === 1) {
-            // É AMANHÃ! -> Etiqueta Vermelha
             etiquetaHTML = `<span style="background: #fff0f0; color: #cc0000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Amanhã</span>`;
         } else if (diferencaDias < 7) {
-            // Menos de 7 dias -> Etiqueta Amarela
             etiquetaHTML = `<span style="background: #fff9e6; color: #b28000; padding: 5px 10px; border-radius: 4px; font-size: 13px; font-weight: bold;">Faltam ${diferencaDias} dias</span>`;
         }
         
-        // Descobre o nome da disciplina vinculada (se houver)
         let nomeDisciplina = "Geral / Nenhuma";
         if (evento.disciplinaIndex !== null && dadosSalvos.disciplinas[evento.disciplinaIndex]) {
             nomeDisciplina = dadosSalvos.disciplinas[evento.disciplinaIndex].nome;
         }
 
-        
         const cardHTML = `
             <div class="card" style="background: #fff; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); position: relative;">
                 
@@ -1112,28 +1069,23 @@ function atualizarEventos() {
                 
             </div>
         `;
-
         
         listaEventos.innerHTML += cardHTML;
     });
 }
 
 function alterarFiltroEventos(novoFiltro) {
-    
     filtroEventoAtual = novoFiltro;
 
-    
     const btnPendentes = document.getElementById('filtro-btn-pendentes');
     const btnConcluidos = document.getElementById('filtro-btn-concluidos');
     const btnTodos = document.getElementById('filtro-btn-todos');
 
-    
     [btnPendentes, btnConcluidos, btnTodos].forEach(btn => {
         btn.style.background = 'transparent';
         btn.style.color = '#555';
     });
 
-    // Aplica o visual "Ativo" apenas no botão correto
     if (novoFiltro === 'pendentes') {
         btnPendentes.style.background = 'var(--brand-color)';
         btnPendentes.style.color = 'white';
@@ -1145,7 +1097,6 @@ function alterarFiltroEventos(novoFiltro) {
         btnTodos.style.color = 'white';
     }
 
-    
     atualizarEventos();
 }
 
@@ -1163,74 +1114,63 @@ document.getElementById('filtro-btn-todos').addEventListener('click', function()
 
 // CONCLUIR EVENTO
 function concluirEvento(idEvento) {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
-    
     const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
 
-    
     if (indexReal !== -1) {
         dadosSalvos.eventos[indexReal].concluido = true;
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarEventos();
     }
 }
 
 // DESFAZER CONCLUIR EVENTO
 function desfazerConclusaoEvento(idEvento) {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
-    
     const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
 
-    
     if (indexReal !== -1) {
         dadosSalvos.eventos[indexReal].concluido = false;
-        localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+        setDadosUsuario(usuarioLogado, dadosSalvos);
         atualizarEventos();
     }
 }
 
 function abrirModalEditarEvento(idEvento) {
-    
     idEventoEdicao = idEvento;
 
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado);
 
-    
     const evento = dadosSalvos.eventos.find(ev => ev.id === idEvento);
     if (!evento) return;
 
-    
     carregarDisciplinasNoSelect();
 
-    
     document.getElementById('input-evento-titulo').value = evento.titulo;
     document.getElementById('select-evento-tipo').value = evento.tipo;
     document.getElementById('select-evento-disciplina').value = evento.disciplinaIndex === null ? "" : evento.disciplinaIndex;
     document.getElementById('input-evento-data').value = evento.data;
     document.getElementById('check-evento-lembrete').checked = evento.lembreteAtivo;
 
-    
     const tituloModal = document.querySelector('#modal-criar-evento h2');
     if (tituloModal) tituloModal.innerText = 'Editar Evento';
 
-    
     modalCriarEvento.style.display = 'flex';
 }
 
-
 function excluirEvento(idEvento) {
     mostrarConfirmacao('Deseja realmente excluir este evento?', function() {
-        const usuarioLogado = localStorage.getItem('usuarioLogado');
-        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado));
+        const usuarioLogado = getUsuarioLogado();
+        const dadosSalvos = getDadosUsuario(usuarioLogado);
         const indexReal = dadosSalvos.eventos.findIndex(ev => ev.id === idEvento);
         if (indexReal !== -1) {
             dadosSalvos.eventos.splice(indexReal, 1);
-            localStorage.setItem(usuarioLogado, JSON.stringify(dadosSalvos));
+            setDadosUsuario(usuarioLogado, dadosSalvos);
             atualizarEventos();
         }
     });
@@ -1251,7 +1191,7 @@ btnCloseSettings.addEventListener('click', function(){
 
 btnLogout.addEventListener('click', function(){
     mostrarConfirmacao('Deseja mesmo sair da sua conta?', function() {
-        localStorage.removeItem('usuarioLogado');
+        removerSessao();
         appView.style.display = 'none';
         authView.style.display = 'flex';
         modalSettings.style.display = 'none';
@@ -1260,16 +1200,16 @@ btnLogout.addEventListener('click', function(){
 
 btnQuickLogout.addEventListener('click', function() {
     mostrarConfirmacao('Deseja mesmo sair da sua conta?', function() {
-        localStorage.removeItem('usuarioLogado');
+        removerSessao();
         appView.style.display = 'none';
         authView.style.display = 'flex';
     });
 });
 
 btnExportar.addEventListener('click', function() {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
-    const dadosSalvos = localStorage.getItem(usuarioLogado); 
-    const blob = new Blob([dadosSalvos], { type: 'application/json' });
+    const usuarioLogado = getUsuarioLogado();
+    const dadosSalvos = getDadosUsuario(usuarioLogado); 
+    const blob = new Blob([JSON.stringify(dadosSalvos)], { type: 'application/json' });
     const linkInvisivel = document.createElement('a');
     linkInvisivel.href = URL.createObjectURL(blob);
     linkInvisivel.download = `mygrad_backup_${usuarioLogado}.json`;
@@ -1295,15 +1235,14 @@ inputImportar.addEventListener('change', function(evento) {
                 return;
             }
 
-            
             dadosImportados.disciplinas.forEach(disc => {
                 if (!disc.atividades) {
                     disc.atividades = [];
                 }
             });
 
-            const usuarioLogado = localStorage.getItem('usuarioLogado');
-            localStorage.setItem(usuarioLogado, JSON.stringify(dadosImportados));
+            const usuarioLogado = getUsuarioLogado();
+            setDadosUsuario(usuarioLogado, dadosImportados);
             
             atualizarDisciplinas();
             alert('Backup restaurado com sucesso!');
@@ -1318,17 +1257,13 @@ inputImportar.addEventListener('change', function(evento) {
 btnSaveChanges.addEventListener('click', function() {
     const newUser = inputNewUser.value.trim();
     const newPass = inputNewPass.value.trim();
-    let currentUser = localStorage.getItem('usuarioLogado');
-    
+    let currentUser = getUsuarioLogado();
     
     const inputCor = document.getElementById('input-cor-tema');
     const novaCor = inputCor ? inputCor.value : '#841D33';
 
-    
-    
     if (newUser === '' && newPass === '') {
-        
-        const dadosAtuais = JSON.parse(localStorage.getItem(currentUser)) || {};
+        const dadosAtuais = getDadosUsuario(currentUser) || {};
         if (dadosAtuais.temaCor === novaCor) {
             alert('Preencha pelo menos um dos campos ou altere a cor para salvar.');
             return;
@@ -1337,44 +1272,39 @@ btnSaveChanges.addEventListener('click', function() {
 
     let alterouAlgo = false;
 
-    
     if (newUser !== '') {
         if (newUser === currentUser) {
             alert('O novo usuário deve ser diferente do atual!');
             return; 
         }
-        if (localStorage.getItem(newUser) !== null) {
+        if (existeUsuario(newUser)) {
             alert('Este usuário já existe. Escolha outro nome!');
             return;
         }
         
-        const dadosSalvos = localStorage.getItem(currentUser);
-        localStorage.setItem(newUser, dadosSalvos); 
-        localStorage.removeItem(currentUser); 
-        localStorage.setItem('usuarioLogado', newUser); 
+        const dadosSalvos = getDadosUsuario(currentUser);
+        setDadosUsuario(newUser, dadosSalvos); 
+        removerDadosUsuario(currentUser); 
+        setUsuarioLogado(newUser); 
         
         currentUser = newUser;
         alterouAlgo = true;
     }
 
-    
     if (newPass !== '') {
-        const dadosSalvos = JSON.parse(localStorage.getItem(currentUser));
+        const dadosSalvos = getDadosUsuario(currentUser);
         dadosSalvos.password = newPass; 
-        localStorage.setItem(currentUser, JSON.stringify(dadosSalvos));
+        setDadosUsuario(currentUser, dadosSalvos);
         alterouAlgo = true;
     }
 
-    
-    const dadosFinais = JSON.parse(localStorage.getItem(currentUser)) || {};
+    const dadosFinais = getDadosUsuario(currentUser) || {};
     dadosFinais.temaCor = novaCor;
-    localStorage.setItem(currentUser, JSON.stringify(dadosFinais));
-    
+    setDadosUsuario(currentUser, dadosFinais);
     
     document.documentElement.style.setProperty('--brand-color', novaCor);
     alterouAlgo = true;
 
-    
     if (alterouAlgo) {
         inputNewUser.value = '';
         inputNewPass.value = '';
@@ -1385,11 +1315,10 @@ btnSaveChanges.addEventListener('click', function() {
 
 // --- TRAVA DE SESSÃO AUTOMÁTICA ---
 function checarSessaoAtiva() {
-    const usuarioLogado = localStorage.getItem('usuarioLogado');
+    const usuarioLogado = getUsuarioLogado();
     
     if (usuarioLogado) {
-        
-        const dadosSalvos = JSON.parse(localStorage.getItem(usuarioLogado)) || {};
+        const dadosSalvos = getDadosUsuario(usuarioLogado) || {};
         if (dadosSalvos.temaCor) {
             document.documentElement.style.setProperty('--brand-color', dadosSalvos.temaCor);
             const inputCor = document.getElementById('input-cor-tema');
@@ -1410,12 +1339,9 @@ function checarSessaoAtiva() {
         if (viewDashboard) viewDashboard.style.display = 'block';
         if (navDashboard) navDashboard.className = 'nav-btn-active';
         
-        
         renderizarSaudacao();
         
-        
         if (typeof atualizarDashboard === 'function') atualizarDashboard();
-        
         
         if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
         if (typeof atualizarEventos === 'function') atualizarEventos();
@@ -1435,5 +1361,3 @@ if ('serviceWorker' in navigator) {
     .then((reg) => console.log('Service Worker do MyGrad Registrado no Escopo:', reg.scope))
     .catch(err => console.log('Erro ao registrar Service Worker:', err));
 }
-
-
