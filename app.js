@@ -1357,11 +1357,16 @@ function checarSessaoAtiva() {
     }
 }
 
-// Executa a checagem assim que o script terminar de carregar
-checarSessaoAtiva();
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js', { scope: './' })
-    .then((reg) => console.log('Service Worker do MyGrad Registrado no Escopo:', reg.scope))
-    .catch(err => console.log('Erro ao registrar Service Worker:', err));
-}
+window.addEventListener('DOMContentLoaded', () => {
+    
+    
+    checarSessaoAtiva();
+
+    // Registra o Service Worker apenas após o carregamento seguro do DOM
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js', { scope: './' })
+        .then((reg) => console.log('Service Worker do MyGrad Registrado no Escopo:', reg.scope))
+        .catch(err => console.log('Erro ao registrar Service Worker:', err));
+    }
+});
