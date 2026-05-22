@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mygrad-v2.1'; // Toda vez que mudar o código, mude essa versão!
+const CACHE_NAME = 'mygrad-v2.2'; // Toda vez que mudar o código, mude essa versão!
 const assets = [
   './', 
   './index.html', 
