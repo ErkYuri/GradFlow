@@ -14,7 +14,7 @@ self.addEventListener('install', e => {
     caches.open(CACHE_NAME).then(cache => {
       return cache.addAll(assets);
     }).then(() => {
-      // Força o SW novo a ativar imediatamente sem ficar esperando
+      // Força o SW  a ativar imediatamente
       return self.skipWaiting(); 
     })
   );
