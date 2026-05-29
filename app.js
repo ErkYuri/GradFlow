@@ -102,6 +102,27 @@ const SVGLogout = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" s
 const SVGCheck = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1e8e3e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 const SVGUndo = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#333333" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: block;"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>`;
 
+const btnForgotPass = document.getElementById('btn-forgot-pass');
+const recoveryModal = document.getElementById('recovery-modal');
+const btnRecoverCancel = document.getElementById('btn-recover-cancel');
+const btnRecoverFind = document.getElementById('btn-recover-find');
+const btnRecoverSave = document.getElementById('btn-recover-save');
+
+const step1 = document.getElementById('recovery-step-1');
+const step2 = document.getElementById('recovery-step-2');
+const inputRecoverUser = document.getElementById('input-recover-user');
+const recoverQuestionText = document.getElementById('recover-question-text');
+const inputRecoverAnswer = document.getElementById('input-recover-answer');
+const inputRecoverNewPass = document.getElementById('input-recover-new-pass');
+
+// Dicionário de perguntas para exibir bonito na tela
+const perguntasDic = {
+    'pet': 'Qual o nome do seu primeiro animal de estimação?',
+    'cidade': 'Em qual cidade você nasceu?',
+    'comida': 'Qual é a sua comida favorita?'
+};
+
+
 // =========================================================
 // DATABASE HELPERS
 // =========================================================
@@ -244,6 +265,10 @@ formRegister.addEventListener('submit', function(evento) {
     const newUser = document.getElementById('register-user').value.trim();
     const newPass = document.getElementById('register-pass').value;
     const ConfirmPass = document.getElementById('confirm-register-pass').value;
+    
+    
+    const securityQ = document.getElementById('register-security-q').value;
+    const securityA = document.getElementById('register-security-a').value.trim().toLowerCase();
 
     if(newPass !== ConfirmPass){
         alert('As senhas não conferem. Favor verificar');
@@ -255,8 +280,11 @@ formRegister.addEventListener('submit', function(evento) {
         return;
     }
 
+    
     const dadosUsuario = {
         password: newPass,
+        securityQ: securityQ,
+        securityA: securityA,
         disciplinas: [],
         eventos: []
     };
@@ -300,6 +328,91 @@ formLogin.addEventListener('submit', function(evento){
     atualizarDashboard(); 
     if (typeof atualizarDisciplinas === 'function') atualizarDisciplinas();
     if (typeof atualizarEventos === 'function') atualizarEventos();
+});
+
+
+// ---------------------------------------------------------
+// RECUPERAÇÃO DE SENHA
+// ---------------------------------------------------------
+
+// Abrir Modal
+if (btnForgotPass) {
+    btnForgotPass.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation(); 
+        
+        console.log("Botão Esqueci minha senha clicado com sucesso!"); 
+        
+        inputRecoverUser.value = '';
+        inputRecoverAnswer.value = '';
+        inputRecoverNewPass.value = '';
+        
+        
+        if (step1) step1.style.display = 'block'; 
+        if (step2) step2.style.display = 'none';
+        
+        if (recoveryModal) {
+            recoveryModal.style.setProperty('display', 'flex', 'important'); 
+        }
+    });
+}
+
+// Cancelar/Fechar Modal
+const btnCancel1 = document.querySelector('.btn-cancel-step-1');
+const btnCancel2 = document.querySelector('.btn-cancel-step-2');
+
+[btnCancel1, btnCancel2].forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', function() {
+            if (recoveryModal) recoveryModal.style.display = 'none';
+        });
+    }
+});
+
+// Buscar Conta
+btnRecoverFind.addEventListener('click', function() {
+    const user = inputRecoverUser.value.trim();
+    if (!existeUsuario(user)) {
+        alert('Usuário não encontrado!');
+        return;
+    }
+    
+    const dadosSalvos = getDadosUsuario(user);
+    if (!dadosSalvos.securityQ || !dadosSalvos.securityA) {
+        alert('Esta conta é de uma versão anterior e não possui pergunta de segurança cadastrada. Restaure via arquivo de backup.');
+        return;
+    }
+
+    // Exibe a pergunta na tela 
+    recoverQuestionText.innerText = perguntasDic[dadosSalvos.securityQ];
+    step1.style.display = 'none';
+    step2.style.display = 'block';
+});
+
+
+btnRecoverSave.addEventListener('click', function() {
+    const user = inputRecoverUser.value.trim();
+    const answerInput = inputRecoverAnswer.value.trim().toLowerCase();
+    const newPass = inputRecoverNewPass.value.trim();
+
+    if (answerInput === '' || newPass === '') {
+        alert('Preencha a resposta secreta e a nova senha!');
+        return;
+    }
+
+    const dadosSalvos = getDadosUsuario(user);
+
+    if (answerInput !== dadosSalvos.securityA) {
+        alert('Resposta secreta incorreta!');
+        return;
+    }
+
+  
+    dadosSalvos.password = newPass;
+    setDadosUsuario(user, dadosSalvos);
+    
+    alert('Senha redefinida com sucesso! Você já pode fazer login.');
+    recoveryModal.style.display = 'none';
 });
 
 function renderizarSaudacao() {

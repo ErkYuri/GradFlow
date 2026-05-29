@@ -10,12 +10,9 @@
 
 <body>
     <main id="main-container">
-        <!-- Autenticacao -->
         <section id="auth-view">
 
-            <!-- FORMULARIO DE LOGIN -->
             <form id="form-login">
-
                 <h2>Fazer Login</h2>
 
                 <div class="input-group">
@@ -28,14 +25,16 @@
                     <input id="login-pass" type="password" placeholder="Informe a senha" required>
                 </div>
 
-                <button type="submit" class="btn-register">Entrar</button>
-                <button type="button" class="btn-show-register">Cadastre-se</button>
+                <div class="form-helpers">
+                    <span id="btn-forgot-pass" class="text-link-forgot">Esqueci minha senha</span>
+                </div>
+
+                <button type="submit" class="btn-login">Entrar</button>
+
+                <button type="button" class="btn-show-register btn-secondary-auth">Criar nova conta</button>
             </form>
 
-
-            <!-- FORMULARIO DE CADASTRO -->
             <form id="form-register" style="display: none;">
-
                 <h2>Cadastre-se</h2>
 
                 <div class="input-group">
@@ -53,68 +52,91 @@
                     <input id="confirm-register-pass" type="password" placeholder="Confirme sua senha" required>
                 </div>
 
-                <button type="submit" class="btn-register">Criar Conta</button>
-                <button type="button" class="btn-cancel-register">Voltar</button>
+                <div class="input-group">
+                    <label for="register-security-q">Pergunta de Segurança</label>
+                    <select id="register-security-q" class="select-security" required>
+                        <option value="" disabled selected>Escolha uma pergunta...</option>
+                        <option value="pet">Qual o nome do seu primeiro animal de estimação?</option>
+                        <option value="cidade">Em qual cidade você nasceu?</option>
+                        <option value="comida">Qual é a sua comida favorita?</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="register-security-a">Resposta Secreta</label>
+                    <input type="text" id="register-security-a" placeholder="Sua resposta secreta" required>
+                </div>
+
+                <div class="form-actions-register">
+                    <button type="button" class="btn-cancel-register">Voltar</button>
+                    <button type="submit" class="btn-register">Cadastrar</button>
+                </div>
             </form>
         </section>
 
-        
+        <div id="recovery-modal" class="modal-overlay modal-top" style="display: none;">
+            <div class="modal-recovery-box">
+                <h2 class="modal-title-custom">Recuperar Senha</h2>
+                
+                <div id="recovery-step-1" class="recovery-step">
+                    <p class="recovery-desc">Digite seu nome de usuário para buscar sua conta.</p>
+                    <input type="text" id="input-recover-user" placeholder="Seu usuário" class="input-form">
+                    <button id="btn-recover-find" class="btn-primary-recover">Buscar Conta</button>
+                    <button type="button" class="btn-secondary-recover btn-cancel-step-1">Cancelar</button>
+                </div>
 
-        <!-- APP LOGADO-->
+                <div id="recovery-step-2" class="recovery-step" style="display: none;">
+                    <p id="recover-question-text" class="recovery-question"></p>
+                    <div class="input-group-recovery">
+                        <input type="text" id="input-recover-answer" placeholder="Sua resposta secreta" class="input-form">
+                        <input type="password" id="input-recover-new-pass" placeholder="Digite a nova senha" class="input-form">
+                    </div>
+                    <button id="btn-recover-save" class="btn-success-recover">Redefinir Senha</button>
+                    <button type="button" class="btn-secondary-recover btn-cancel-step-2">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
         <section id="app-view" style="display: none;">
 
-            <!-- Header fixo do app -->
-            <header style="display: flex; justify-content: space-between; align-items: center; background: var(--brand-color); padding: 16px; color: white;">
-                <h1 id="user-greeting" style="margin: 0; font-size: 18px; font-weight: bold; text-transform: capitalize;">Olá, Carregando...</h1>
-                <div style="display: flex; align-items: center; gap: 16px;">
-                    
-                    <button id="btn-settings" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; padding: 4px;" title="Configurações">
+            <header class="app-header">
+                <h1 id="user-greeting" class="app-header-title">Olá, Carregando...</h1>
+                <div class="app-header-actions">
+                    <button id="btn-settings" class="btn-icon" title="Configurações">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </button>
-
-                    <button id="btn-quick-logout" style="background: transparent; border: none; cursor: pointer; display: flex; align-items: center; padding: 4px;" title="Sair da Conta">
+                    <button id="btn-quick-logout" class="btn-icon" title="Sair da Conta">
                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
                     </button>
-
                 </div>
             </header>
 
-            <!-- Conteudo dinamico -->
             <article id="content-area">
 
                 <div id="view-dashboard">
-                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 20px;">Painel Geral</h2>
-                    
-                    <div id="container-dashboard" style="display: flex; flex-direction: column; gap: 16px;">
-
-                    </div>
+                    <h2 class="view-title">Painel Geral</h2>
+                    <div id="container-dashboard" class="dashboard-container"></div>
                 </div>
                 
                 <div id="view-faltas" style="display: none;">
-                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Faltas</h2>
-
+                    <h2 class="view-title">Minhas Faltas</h2>
                     <input type="text" id="input-pesquisa" placeholder="Pesquisar disciplina...">
-
                     <div id="lista-disciplinas" class="disciplinas"></div>
                 </div>
                 
                 <div id="view-notas" style="display: none;">
-                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 12px;">Minhas Notas</h2>
-
-                    <input type="text" id="input-pesquisa" placeholder="Pesquisar disciplina...">
-
-                    <div id=lista-notas class="disciplinas">
-
-                    </div>
+                    <h2 class="view-title">Minhas Notas</h2>
+                    <input type="text" id="input-pesquisa-notas" placeholder="Pesquisar disciplina..." class="input-search">
+                    <div id="lista-notas" class="disciplinas"></div>
                 </div>
 
-                <div id="view-eventos" style="display: none; padding: 16px;">
-                    <h2 style="text-align: center; color: var(--brand-color); margin-bottom: 20px;">Meus Eventos</h2>
+                <div id="view-eventos" class="view-eventos-container" style="display: none;">
+                    <h2 class="view-title">Meus Eventos</h2>
                     
-                    <div style="display: flex; background: #eee; padding: 4px; border-radius: 8px; margin-bottom: 20px; gap: 4px;">
-                        <button id="filtro-btn-pendentes" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: var(--brand-color); color: white; transition: background 0.2s;">Pendentes</button>
-                        <button id="filtro-btn-concluidos" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: transparent; color: #555; transition: background 0.2s;">Concluídos</button>
-                        <button id="filtro-btn-todos" style="flex: 1; padding: 8px; border: none; border-radius: 6px; font-weight: bold; font-size: 13px; cursor: pointer; background: transparent; color: #555; transition: background 0.2s;">Todos</button>
+                    <div class="filter-container">
+                        <button id="filtro-btn-pendentes" class="btn-filter filter-active">Pendentes</button>
+                        <button id="filtro-btn-concluidos" class="btn-filter">Concluídos</button>
+                        <button id="filtro-btn-todos" class="btn-filter">Todos</button>
                     </div>
                     
                     <div id="lista-eventos"></div>
@@ -122,8 +144,6 @@
 
             </article>
 
-
-            <!-- Barra de navegacao -->
             <nav class="bottom-nav">
                 <ul>
                     <li>
@@ -153,73 +173,61 @@
                 </ul>
             </nav>
 
-            <!-- MODAL DE CONFIGURACOES -->
             <div id="settings-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Configurações</h2>
                     
-
-                    <div class="modal-backup-actions" style="display: flex; gap: 8px; margin-bottom: 16px;">
-                        <button id="btn-exportar" class="btn-backup btn-export" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: none; border-radius: 8px; background: #37474f; color: white; font-weight: bold; cursor: pointer;">
+                    <div class="modal-backup-actions">
+                        <button id="btn-exportar" class="btn-backup btn-export">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                             Exportar
                         </button>
                         <input type="file" id="input-importar" accept=".json" style="display: none;">
-                        <button id="btn-importar" class="btn-backup btn-import" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border: none; border-radius: 8px; background: #78909c; color: white; font-weight: bold; cursor: pointer;">
+                        <button id="btn-importar" class="btn-backup btn-import">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                             Importar
                         </button>
                     </div>
-
                     
-                    <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 8px;">
-                        <p style="margin: 0 0 12px 0; font-weight: bold; color: #555; font-size: 14px;">Dados da Conta</p>
-                        
-                        <div style="display: flex; flex-direction: column; gap: 12px;">
-                            <input type="text" id="input-new-user" placeholder="Novo nome de usuário" style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; width: 100%;">
-                            
-                            <input type="password" id="input-new-pass" placeholder="Nova senha" style="padding: 12px; border: 1px solid #ccc; border-radius: 8px; width: 100%;">
+                    <div class="settings-section">
+                        <p class="settings-label">Dados da Conta</p>
+                        <div class="settings-inputs">
+                            <input type="text" id="input-new-user" placeholder="Novo nome de usuário">
+                            <input type="password" id="input-new-pass" placeholder="Nova senha">
                         </div>
                     </div>
 
-                    <div style="border-top: 1px solid #eee; padding-top: 16px; margin-bottom: 16px;">
-                        <p style="margin: 0 0 12px 0; font-weight: bold; color: #555; font-size: 14px;">Aparência</p>
-                        
-                        <div style="display: flex; align-items: center; justify-content: space-between;">
-                            <label for="input-cor-tema" style="font-size: 14px; color: #333;">Cor Principal:</label>
-                            <input type="color" id="input-cor-tema" value="#841D33" style="width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; padding: 0; background: transparent;">
+                    <div class="settings-section">
+                        <p class="settings-label">Aparência</p>
+                        <div class="settings-color-picker">
+                            <label for="input-cor-tema">Cor Principal:</label>
+                            <input type="color" id="input-cor-tema" value="#841D33" class="color-input">
                         </div>
                     </div>
 
-                    <button id="btn-save-changes" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-bottom: 5px;">Salvar Alterações</button>
+                    <button id="btn-save-changes" class="btn-primary">Salvar Alterações</button>
 
-                    <div style="display: flex; gap: 12px;">
-                        <button id="btn-close-settings" class="btn-secondary" style="flex: 1; margin: 0; padding: 12px;">Fechar</button>
-                        <button id="btn-logout" class="btn-danger" style="flex: 1; margin: 0; padding: 12px;">Sair da Conta</button>
+                    <div class="settings-footer-actions">
+                        <button id="btn-close-settings" class="btn-secondary">Fechar</button>
+                        <button id="btn-logout" class="btn-danger">Sair da Conta</button>
                     </div>
                 </div>
             </div>
 
-
-            
-            <!-- MODAL DE EDICAO DE DISCIPLINA -->
             <div id="edit-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Editar Disciplina</h2>
-
                     <div class="edit-inputs">
                         <input type="text" id="input-edit-nome" placeholder="Nome da Disciplina">
                         <input type="text" id="input-edit-professor" placeholder="Nome do Professor (Opcional)">
                         <input type="text" id="input-edit-sala" placeholder="Sala (Opcional)">
                         <input type="number" id="input-edit-limite" placeholder="Limite de Faltas">
                     </div>
-
                     <button id="btn-save-edit">Salvar</button>
                     <button id="btn-cancel-edit" class="btn-secondary">Cancelar</button>
                 </div>
             </div>
 
-            <!-- MODAL DE ADICIONAR NOTA -->
             <div id="modal-nova-nota" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2 id="titulo-modal-nota">Lançar Nota</h2>
@@ -227,13 +235,11 @@
                         <input type="text" id="input-nota-nome" placeholder="Ex.: Prova 1" required>
                         <input type="number" id="input-nota-valor" placeholder="Nota" required>
                     </div>
-
-                    <button id="btn-save-nota" class="btn-primary">Salvar</button>
+                    <button id="btn-save-nota" class="btn-primary" style="margin-top: 16px;">Salvar</button>
                     <button id="btn-cancel-nota" class="btn-secondary">Cancelar</button>
                 </div>
             </div>
 
-            <!-- BOTAO FLUTUANTE -->
             <div id="fab-overlay" style="display: none;"></div>
 
             <div id="fab-container">
@@ -250,7 +256,6 @@
                 <button id="fab-main">+</button>
             </div>
 
-            <!-- MODAL DE ADICIONAR DISCIPLINA -->
             <div id="create-disciplina-modal" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Nova Disciplina</h2>
@@ -260,89 +265,73 @@
                         <input type="text" id="input-create-sala" placeholder="Sala (Opcional)">
                         <input type="number" id="input-create-limite" placeholder="Limite de Faltas">
                     </div>
-                    <button id="btn-save-new-disciplina" style="width: 100%; padding: 14px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 16px;">Criar Disciplina</button>
+                    <button id="btn-save-new-disciplina" class="btn-primary" style="margin-top: 16px;">Criar Disciplina</button>
                     <button id="btn-cancel-new-disciplina" class="btn-secondary" style="margin-top: 8px;">Cancelar</button>
                 </div>
             </div>
 
-            <!-- MODAL HISTORICO DE NOTAS -->
             <div id="modal-historico" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Histórico de Notas</h2>
-
-                    <div id="lista-historico" class="lista-historico">
-
-                    </div>
-
+                    <div id="lista-historico" class="lista-historico"></div>
                     <button id="btn-close-historico" class="btn-secondary">Fechar</button>
                 </div>
             </div>
-
-            <!-- ================================================================================ -->
-            <!-- ----------------------- MODAL DE EVENTOS ----------------------- -->
-            <!-- ================================================================================ -->
 
             <div id="modal-criar-evento" class="modal-overlay" style="display: none;">
                 <div class="modal-content">
                     <h2>Novo Evento</h2>
                     <div class="edit-inputs">
-                        
                         <input type="text" id="input-evento-titulo" placeholder="Ex: Prova 2, Lista 1...">   
-
-                        <select id="select-evento-tipo">
+                        <select id="select-evento-tipo" class="select-form">
                             <option value="prova">Prova</option>
                             <option value="trabalho">Trabalho</option>
                             <option value="atividade">Atividade</option>
                             <option value="outros">Outros</option>
                         </select>
-
-                        <select id="select-evento-disciplina">
+                        <select id="select-evento-disciplina" class="select-form">
                             <option value="">Carregando disciplinas...</option>
                         </select>
-
                         <input type="date" id="input-evento-data">
-
                         <div class="form-toggle">
-                            <span style="font-weight: bold; color: #555; font-size: 14px;">Ativar Alerta</span>
+                            <span class="toggle-label">Ativar Alerta</span>
                             <label class="switch">
                                 <input type="checkbox" id="check-evento-lembrete" checked>
                                 <span class="slider round"></span>
                             </label>
                         </div>
                     </div>
-
                     <button id="btn-save-evento" class="btn-primary">Salvar</button>
                     <button id="btn-cancel-evento" class="btn-secondary">Cancelar</button>
-                    
                 </div>
             </div>
 
-            <div id="custom-alert-modal" class="modal-overlay" style="display: none; z-index: 9999;">
-                <div class="modal-content" style="max-width: 320px; text-align: center;">
-                    <h3 id="custom-alert-title" style="margin-top: 0; color: var(--brand-color);">Atenção</h3>
-                    <p id="custom-alert-message" style="color: #555; font-size: 15px; margin-bottom: 24px;"></p>
-                    <button id="btn-custom-alert-ok" style="width: 100%; padding: 12px; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">OK</button>
+            <div id="custom-alert-modal" class="modal-overlay modal-top" style="display: none;">
+                <div class="modal-content modal-small">
+                    <h3 id="custom-alert-title" class="modal-title-custom">Atenção</h3>
+                    <p id="custom-alert-message" class="modal-message-custom"></p>
+                    <button id="btn-custom-alert-ok" class="btn-primary">OK</button>
+                </div>
+            </div>
+
+            <div id="custom-confirm-modal" class="modal-overlay modal-top" style="display: none;">
+                <div class="modal-content modal-small">
+                    <h3 id="custom-confirm-title" class="modal-title-custom">Confirmação</h3>
+                    <p id="custom-confirm-message" class="modal-message-custom"></p>
+                    <div class="modal-actions-row">
+                        <button id="btn-custom-confirm-cancel" class="btn-secondary">Cancelar</button>
+                        <button id="btn-custom-confirm-yes" class="btn-primary">Sair</button>
+                    </div>
                 </div>
             </div>
 
             
+           
+
         </section>
 
-        <div id="custom-confirm-modal" class="modal-overlay" style="display: none; z-index: 9999;">
-            <div class="modal-content" style="max-width: 320px; text-align: center;">
-                <h3 id="custom-confirm-title" style="margin-top: 0; color: var(--brand-color);">Confirmação</h3>
-                <p id="custom-confirm-message" style="color: #555; font-size: 15px; margin-bottom: 24px;"></p>
-                <div style="display: flex; gap: 12px;">
-                    <button id="btn-custom-confirm-cancel" class="btn-secondary" style="flex: 1; padding: 12px; margin: 0; background: #eee; color: #555; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Cancelar</button>
-                    <button id="btn-custom-confirm-yes" style="flex: 1; padding: 12px; margin: 0; background: var(--brand-color); color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">Sair</button>
-                </div>
-            </div>
-        </div>
 
     </main>
     <script src="./app.js"></script>
 </body>
 </html>
-
-    
-        

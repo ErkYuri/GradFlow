@@ -16,7 +16,8 @@ body {
     min-height: 100dvh;
 }
 
-label:has(+ input:required)::after {
+label:has(+ input:required)::after,
+label:has(+ select:required)::after {
     content: '*';
     color: var(--brand-color);
 }
@@ -45,16 +46,14 @@ form {
     gap: 16px;
     width: 100%;
     max-width: 400px;
-
     background-color: #e2dede; 
     padding: 32px;
     border-radius: 16px;
-    
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 
                 0 12px 28px rgba(132, 29, 51, 0.15);
 }
 
-input {
+input, .input-form {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
@@ -65,9 +64,10 @@ input {
 .input-group {
     display: flex;
     flex-direction: column;
-    gap: 2px
+    gap: 4px;
 }
 
+/* --- BOTÕES PADRÕES --- */
 .btn-primary {
     width: 100%;
     font-size: 14px;
@@ -76,8 +76,8 @@ input {
     color: #ffffff;
     border-radius: 8px;
     border: none;
-    width: 100%;
     padding: 14px;
+    cursor: pointer;
 }
 
 .btn-secondary { 
@@ -92,7 +92,42 @@ input {
     cursor: pointer; 
 }
 
+.btn-success {
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #1e8e3e;
+    color: white;
+    border-radius: 8px;
+    border: none;
+    padding: 14px;
+    cursor: pointer;
+}
+
+.btn-danger { 
+    width: 100%; 
+    padding: 14px; 
+    background: #480000; 
+    color: white; 
+    border: none; 
+    border-radius: 8px; 
+    font-weight: bold; 
+    cursor: pointer; 
+}
+
 .btn-register {
+    width: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: var(--brand-color);
+    color: #ffffff;
+    border-radius: 8px;
+    border: none;
+    padding: 12px;
+    cursor: pointer; 
+}
+
+.btn-login {
     width: 100%;
     font-size: 14px;
     font-weight: bold;
@@ -100,50 +135,192 @@ input {
     color: #ffffff;
     border-radius: 8px;
     border: none;
-    width: 100%;
-    padding: 12px; 
+    padding: 12px;
+    cursor: pointer; 
 }
 
-.btn-show-register {
-    font-size: 16px;
-    font-weight: bold;
-    background-color: transparent;
-    border: none;
-    color: var(--brand-color);
-    padding: 2px;
+.form-actions-register {
+    display: flex;
+    flex-direction: row; /* Garante que fiquem um em cima do outro */
+    gap: 12px;             /* Cria o respiro perfeito entre o botão Voltar e Cadastrar */
+    width: 100%;
+    margin-top: 6px;       /* Afasta os botões do último input */
 }
 
 .btn-cancel-register {
+    width: 50%;
     color: white;
-    font-size: 16px;
+    font-size: 14px;
+    font-weight: bold;
     background-color: #333;
     border-radius: 8px;
-    border: 2px solid #333;
-    width: 100%;
-    padding: 8px;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
 }
 
+/* --- INTERFACE DE LOGIN --- */
 
 
 
-/*-------------------------------------------- TELA INICIAL --------------------------------------------------*/
+.form-helpers {
+    display: flex;
+    justify-content: flex-end; 
+    width: 100%;
+    margin-top: -4px;
+    margin-bottom: 4px;
+}
 
-header {
+/* Link esqueci minha senha */
+.text-link-forgot {
+    color: #555;
+    font-size: 13px;
+    cursor: pointer;
+    font-weight: 500;
+    pointer-events: auto; 
+    position: relative;   
+    z-index: 10;          
+    transition: color 0.2s ease, text-decoration 0.2s ease;
+}
+
+.text-link-forgot:hover {
+    color: var(--brand-color);
+    text-decoration: underline;
+}
+
+.btn-secondary-auth {
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: transparent;
+    color: var(--brand-color);
+    border: 2px solid var(--brand-color);
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-secondary-auth:hover {
     background-color: var(--brand-color);
     color: #ffffff;
-    padding: 15px 20px;
+}
+
+/* --- OTEMIZAÇÃO COMPACTA DO CADASTRO (v2.6) --- */
+
+#form-register {
+    max-width: 320px;
+    gap: 10px;          
+}
+
+#form-register h2 {
+    margin-bottom: 2px;
+    font-size: 22px;
+}
+
+#form-register .input-group {
+    gap: 2px;           
+}
+
+#form-register label {
+    font-size: 13px;    
+    color: #333;
+}
+
+#form-register input, 
+#form-register .select-security {
+    padding: 8px 12px;  
+    font-size: 15px;
+}
+
+#form-register button {
+    margin-top: 2px;    
+}
+
+/*-------------------------------------------- TELA INICIAL (APP) --------------------------------------------------*/
+
+.app-header {
+    background-color: var(--brand-color);
+    color: #ffffff;
+    padding: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-header h1 {
+.app-header-title {
     margin: 0;
-    font-size: 22px;
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.app-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
 }
 
 h2 {
     text-align: center;
+}
+
+.view-title {
+    text-align: center;
+    color: var(--brand-color);
+    margin-bottom: 20px;
+}
+
+#content-area {
+    padding: 20px;
+    padding-bottom: 100px;
+}
+
+.dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.view-eventos-container {
+    padding: 16px;
+}
+
+/* --- FILTROS EVENTOS --- */
+.filter-container {
+    display: flex;
+    background: #eee;
+    padding: 4px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    gap: 4px;
+}
+
+.btn-filter {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    background: transparent;
+    color: #555;
+    transition: background 0.2s;
+}
+
+.filter-active {
+    background: var(--brand-color);
+    color: white;
 }
 
 /* fixando navbar */
@@ -154,9 +331,7 @@ h2 {
     width: 100%;
     background-color: #FFFFFF;
     box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
-    z-index: 1000; /* Garante que ela fique sempre por cima de tudo */
-    
-    
+    z-index: 1000;
     padding-bottom: env(safe-area-inset-bottom, 0px); 
 }
 
@@ -171,12 +346,12 @@ h2 {
 .nav-btn, .nav-btn-active {
     background: transparent;
     border-style: none;
-    padding: 10px 4px; /* Mais ajustado para não ficar gigante */
+    padding: 10px 4px;
     width: 100%;
     display: flex;
-    flex-direction: column; /* Coloca o ícone EM CIMA do texto */
+    flex-direction: column;
     align-items: center;
-    gap: 6px; /* Respiro entre o ícone e a palavra */
+    gap: 6px;
     cursor: pointer;
     transition: color 0.2s ease;
 }
@@ -193,38 +368,13 @@ h2 {
     font-weight: bold;
 }
 
-
 .nav-btn svg, .nav-btn-active svg {
     stroke: currentColor; 
 }
 
 
-/* Barra de adicionar disciplina */
-
-#content-area {
-    padding: 20px;
-    padding-bottom: 100px;
-}
-.add-subject {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-}
-
-.add-subject input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-}
-
-.lista-disciplinas-vazia {
-    text-align: center;
-    margin: auto;
-}
-
-#input-pesquisa {
+/* --- PESQUISA --- */
+#input-pesquisa, .input-search {
     width: 100%;
     padding: 12px 12px 12px 42px;
     border: 1px solid #ccc;
@@ -235,27 +385,11 @@ h2 {
     background-position: 14px center;
 }
 
-.edit-inputs {
+.edit-inputs, .nota-inputs {
     display: flex;
     flex-direction: column;
     gap: 12px;
     margin-top: 16px;
-}
-
-.nota-inputs {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 16px;
-}
-
-#btn-add-disciplina {
-    background: var(--brand-color);
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    color: #fff;
-    font-weight: bold;
 }
 
 #btn-save-edit {
@@ -274,7 +408,7 @@ h2 {
     margin-top: 8px;
 }
 
-/* --- MODAL DE CONFIGURAÇÕES --- */
+/* --- MODAIS GERAIS --- */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -284,16 +418,26 @@ h2 {
     align-items: center;
 }
 
+.modal-top {
+    z-index: 9999;
+}
+
 .modal-content {
     background: #fff;
-    padding: 32px; /* Mais espaço interno */
+    padding: 32px;
     border-radius: 16px;
     width: 90%;
     max-width: 400px;
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Desaperta os elementos */
+    gap: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.modal-small {
+    max-width: 320px;
+    text-align: center;
+    padding: 24px;
 }
 
 .modal-content h2 { 
@@ -302,19 +446,35 @@ h2 {
     text-align: center; 
 }
 
-.modal-user-info { 
-    font-size: 16px; 
-    text-align: center; 
-    margin: 0; 
+.modal-title-custom {
+    margin-top: 0;
+    color: var(--brand-color);
 }
 
+.modal-message-custom {
+    color: #555;
+    font-size: 15px;
+    margin-bottom: 24px;
+}
+
+.modal-actions-row {
+    display: flex;
+    gap: 12px;
+}
+
+/* --- CONFIGURAÇÕES E BACKUP --- */
 .modal-backup-actions { 
     display: flex; 
     gap: 10px; 
+    margin-bottom: 16px;
 }
 
 .btn-backup { 
     flex: 1; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     padding: 12px; 
     border: none; 
     border-radius: 8px; 
@@ -324,32 +484,170 @@ h2 {
 }
 
 .btn-export { 
-    background: #e6a700; 
-    color: #222; 
+    background: #37474f; 
+    color: white; 
 }
 
 .btn-import { 
-    background: #222; 
-    color: #fff; 
+    background: #78909c; 
+    color: white; 
 }
 
-.btn-danger { 
+.settings-section {
+    border-top: 1px solid #eee;
+    padding-top: 16px;
+    margin-bottom: 8px;
+}
+
+.settings-label {
+    margin: 0 0 12px 0;
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
+}
+
+.settings-inputs {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.settings-color-picker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.settings-color-picker label {
+    font-size: 14px;
+    color: #333;
+}
+
+.color-input {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 0;
+    background: transparent;
+}
+
+.settings-footer-actions {
+    display: flex;
+    gap: 12px;
+}
+
+
+/* =========================================================
+   --RECUPERAÇÃO DE SENHA  ---
+   ========================================================= */
+
+
+.modal-recovery-box {
+    background: #ffffff;
+    max-width: 340px;
+    width: 90%;
+    padding: 28px 24px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Título Principal */
+.modal-recovery-box h2.modal-title-custom { 
+    margin: 0 0 16px 0; 
+    color: var(--brand-color); 
+    text-align: center; 
+}
+
+
+.recovery-step {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+.recovery-desc {
+    font-size: 14px;
+    color: #555;
+    line-height: 1.4;
+    text-align: center;
+    margin-bottom: 16px; 
+}
+
+.recovery-question {
+    font-weight: bold;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    background: #f5f5f5;
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid var(--brand-color);
+    margin-bottom: 16px; 
+}
+
+
+.input-group-recovery {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+
+.modal-recovery-box input.input-form {
+    margin-bottom: 12px; 
+}
+
+/* --- ESTILIZAÇÃO E AFINAMENTO DOS BOTÕES --- */
+
+.btn-primary-recover, 
+.btn-success-recover {
+    width: 100%;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 8px;
+    border: none;
+    padding: 14px;
+    cursor: pointer;
+    margin-bottom: 12px; 
+}
+
+.btn-primary-recover {
+    background-color: var(--brand-color);
+    color: #ffffff;
+}
+
+.btn-success-recover {
+    background-color: #1e8e3e;
+    color: white;
+}
+
+
+.btn-secondary-recover { 
     width: 100%; 
+    font-size: 14px;
     padding: 14px; 
-    background: #480000; 
-    color: white; 
+    background: #ccc; 
+    color: #333; 
     border: none; 
     border-radius: 8px; 
     font-weight: bold; 
-    cursor: pointer; 
+    cursor: pointer;
+    margin: 0; 
 }
 
 
 
-/* --- FAB (Floating Action Button) --- */
+
+/* --- FAB --- */
 #fab-container {
     position: fixed;
-    bottom: 80px; /* Fica acima da barra de navegação que tem uns 60px */
+    bottom: 80px; 
     right: 20px;
     display: flex;
     flex-direction: column;
@@ -409,18 +707,21 @@ h2 {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 899; /* Fica exatamente ATRÁS do FAB (que é 900) e na frente do App */
+    z-index: 899; 
 }
 
-/* -------------------------------------------------------------------
------------------- CSS DO TOGGLE SWITCH ---------------
----------------------------------------------------------------------- */
-
+/* --- TOGGLE SWITCH --- */
 .form-toggle {
     display: flex;
     align-items: center;
     justify-content: space-between;
     margin: 16px 0;
+}
+
+.toggle-label {
+    font-weight: bold;
+    color: #555;
+    font-size: 14px;
 }
 
 .switch {
@@ -458,30 +759,24 @@ h2 {
     transition: .3s;
 }
 
-/* Quando o usuário clica e ativa muda a cor de fundo para o tom do app */
 .switch input:checked + .slider {
     background-color: var(--brand-color);
 }
 
-/* Quando ativa, move a bolinha branca para a direita */
 .switch input:checked + .slider:before {
     transform: translateX(20px);
 }
 
-/* Deixa as bordas da pílula e da bolinha arredondadas */
 .slider.round {
     border-radius: 24px;
 }
+
 .slider.round:before {
     border-radius: 50%;
 }
 
-/* -------------------------------------------- */
-/* Padronização dos elementos Select do modal */
-/* -------------------------------------------- */
-
-#select-evento-disciplina,
-#select-evento-tipo {
+/* --- SELECT PADRÃO --- */
+.select-form, .select-security {
     width: 100%;
     padding: 12px;
     border: 1px solid #ccc;
@@ -492,25 +787,20 @@ h2 {
     font-family: inherit;
     cursor: pointer;
     
-    
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
 
-    /* Injeta uma setinha preta na direita via imagem de fundo */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
     padding-right: 40px;
 }
 
-/* Efeito de foco quando o usuário clica para abrir */
-#select-evento-disciplina:focus,
-#select-evento-tipo:focus {
+.select-form:focus, .select-security:focus {
     outline: none;
     border-color: var(--brand-color);
 }
-
 
 /* --- GRÁFICOS DO DASHBOARD --- */
 .donut-container {
@@ -523,7 +813,6 @@ h2 {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    
     background: #e0e0e0; 
     display: flex;
     justify-content: center;
