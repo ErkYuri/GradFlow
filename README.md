@@ -32,4 +32,10 @@ O aplicativo está disponível para uso através da Vercel:
 
 ---
 
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
 Desenvolvido com 💻 e ☕ por [Erick Yuri](https://github.com/ErkYuri).
