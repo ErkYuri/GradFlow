@@ -292,7 +292,7 @@ h2 {
     max-width: 400px;
     display: flex;
     flex-direction: column;
-    gap: 16px; /* Desaperta os elementos! */
+    gap: 16px; /* Desaperta os elementos */
     box-shadow: 0 10px 30px rgba(0,0,0,0.2);
 }
 
@@ -458,12 +458,12 @@ h2 {
     transition: .3s;
 }
 
-/* Quando o usuário clica e ativa Muda a cor de fundo para o tom do app */
+/* Quando o usuário clica e ativa muda a cor de fundo para o tom do app */
 .switch input:checked + .slider {
     background-color: var(--brand-color);
 }
 
-/* Quando ativa, move a bolinha branca 20px para a direita */
+/* Quando ativa, move a bolinha branca para a direita */
 .switch input:checked + .slider:before {
     transform: translateX(20px);
 }
@@ -497,7 +497,7 @@ h2 {
     -moz-appearance: none;
     appearance: none;
 
-    /* Injeta uma setinha minimalista preta na direita via imagem de fundo */
+    /* Injeta uma setinha preta na direita via imagem de fundo */
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23333333' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
@@ -523,7 +523,7 @@ h2 {
     width: 70px;
     height: 70px;
     border-radius: 50%;
-    /* O conic-gradient será alimentado pelo JavaScript na hora de renderizar! */
+    
     background: #e0e0e0; 
     display: flex;
     justify-content: center;
